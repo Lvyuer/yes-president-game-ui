@@ -19,6 +19,16 @@ npm run build:docs   # 构建 GitHub Pages 文档站 → playground-dist
 
 文档站路由示例：`/#/overview`、`/#/feature-button`、`/#/panel`、`/#/dashboard`。
 
+## 部署
+
+文档站当前通过 `gh-pages` 分支发布（`npm run build:docs` 后推送 `playground-dist` 内容）。
+
+启用 GitHub Actions 自动部署：
+
+1. 授权 workflow 权限：`gh auth refresh -h github.com -s workflow`
+2. 推送 `.github/workflows/deploy-pages.yml`：`git push origin main`
+3. 仓库 **Settings → Pages → Build and deployment** 选 **GitHub Actions**
+
 ## 文档
 
 - [AGENT_USAGE.md](src/docs/AGENT_USAGE.md)
