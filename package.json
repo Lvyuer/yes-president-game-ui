@@ -1,0 +1,47 @@
+{
+  "name": "yes-president-game-ui",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Yes President game UI component library — gold-frame material theme",
+  "type": "module",
+  "main": "dist/yes-president-game-ui.umd.cjs",
+  "module": "dist/yes-president-game-ui.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/yes-president-game-ui.js",
+      "require": "./dist/yes-president-game-ui.umd.cjs"
+    },
+    "./style": "./dist/style.css"
+  },
+  "files": [
+    "dist",
+    "src/docs"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "**/*.vue"
+  ],
+  "scripts": {
+    "dev": "vite --config vite.config.playground.ts",
+    "build": "vue-tsc --noEmit && vite build && vite build --config vite.config.playground.ts",
+    "build:lib": "vue-tsc --noEmit && vite build",
+    "build:docs": "vue-tsc --noEmit && cross-env GITHUB_PAGES=true vite build --config vite.config.playground.ts",
+    "preview": "vite preview --config vite.config.playground.ts",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "peerDependencies": {
+    "vue": ">=3.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "cross-env": "^7.0.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6",
+    "vite-plugin-dts": "^5.0.3",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.7"
+  }
+}

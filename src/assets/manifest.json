@@ -1,0 +1,369 @@
+{
+  "version": "1.7.0",
+  "theme": "default",
+  "assets": [
+    {
+      "id": "button-frame-default",
+      "file": "src/assets/themes/default/frames/button-frame.png",
+      "type": "button-frame",
+      "sourceFile": "src/assets/raw/button-frame-original.png",
+      "size": [860, 390],
+      "alphaBBox": [82, 88, 778, 302],
+      "usage": ["feature-button", "hero-action", "wide-action"],
+      "componentTargets": ["GameFeatureButton"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 93,
+        "right": 93,
+        "bottom": 93,
+        "left": 93,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 56,
+        "right": 56,
+        "bottom": 56,
+        "left": 56
+      },
+      "minSize": [220, 120],
+      "forbiddenUses": [
+        "do not use as a small text button",
+        "do not bake labels into the PNG",
+        "do not shrink below 220px width"
+      ],
+      "notes": "v1 dark leather feature button frame with gold corners and star ornaments."
+    },
+    {
+      "id": "button-frame-cream",
+      "file": "src/assets/themes/default/frames/button-frame-cream.png",
+      "type": "button-frame",
+      "sourceFile": "src/assets/raw/button-frame-cream-original.png",
+      "size": [820, 263],
+      "alphaBBox": [24, 24, 796, 239],
+      "usage": ["text-button", "confirm-button"],
+      "componentTargets": ["GameButton"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 56,
+        "right": 56,
+        "bottom": 56,
+        "left": 56,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 48,
+        "right": 48,
+        "bottom": 48,
+        "left": 48
+      },
+      "minSize": [200, 100],
+      "forbiddenUses": [
+        "do not bake labels into the PNG"
+      ],
+      "notes": "Cream-fill gold/black frame. Reserved for GameButton."
+    },
+    {
+      "id": "panel-frame-default",
+      "file": "src/assets/themes/default/frames/panel-frame.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/panel-frame-original.png",
+      "size": [910, 340],
+      "alphaBBox": [24, 24, 886, 316],
+      "usage": ["large-panel", "medium-card", "resource-bar"],
+      "componentTargets": ["GamePanel", "GameResourceBar"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 48,
+        "right": 48,
+        "bottom": 48,
+        "left": 48,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 40,
+        "right": 40,
+        "bottom": 40,
+        "left": 40
+      },
+      "minSize": [280, 120],
+      "forbiddenUses": [
+        "do not use as a small text button",
+        "do not bake labels into the PNG"
+      ],
+      "notes": "General large panel frame — dark leather, gold double border with corner arcs."
+    },
+    {
+      "id": "notice-frame-default",
+      "file": "src/assets/themes/default/frames/notice-frame.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/notice-frame-original.png",
+      "size": [938, 363],
+      "alphaBBox": [24, 24, 914, 339],
+      "usage": ["notice", "alert-bar", "toast-strip"],
+      "componentTargets": ["GameNotice", "NoticeStack"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 72,
+        "right": 72,
+        "bottom": 72,
+        "left": 72,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 40,
+        "right": 40,
+        "bottom": 40,
+        "left": 40
+      },
+      "minSize": [280, 88],
+      "forbiddenUses": [
+        "do not bake labels into the PNG",
+        "do not use as a large content panel"
+      ],
+      "notes": "Notification bar frame with gold double border and geometric corner notches."
+    },
+    {
+      "id": "input-frame-default",
+      "file": "src/assets/themes/default/frames/input-frame.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/input-frame-original.png",
+      "size": [800, 252],
+      "alphaBBox": [24, 24, 776, 228],
+      "usage": ["text-input", "field"],
+      "componentTargets": ["GameInput"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 72,
+        "right": 72,
+        "bottom": 72,
+        "left": 72,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 40,
+        "right": 40,
+        "bottom": 40,
+        "left": 40
+      },
+      "minSize": [200, 64],
+      "forbiddenUses": [
+        "do not bake placeholder text into the PNG"
+      ],
+      "notes": "Input field frame — dark fill, gold double border with corner flourishes. Native input is DOM."
+    },
+    {
+      "id": "select-frame-default",
+      "file": "src/assets/themes/default/frames/select-frame.png",
+      "type": "button-frame",
+      "sourceFile": "src/assets/raw/select-frame-original.png",
+      "size": [844, 174],
+      "alphaBBox": [24, 24, 820, 150],
+      "usage": ["select", "dropdown"],
+      "componentTargets": ["GameSelect"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 48,
+        "right": 126,
+        "bottom": 48,
+        "left": 48,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 28,
+        "right": 72,
+        "bottom": 28,
+        "left": 28
+      },
+      "minSize": [220, 56],
+      "forbiddenUses": [
+        "do not bake option labels into the PNG",
+        "do not stretch the right chevron panel — keep large right slice"
+      ],
+      "notes": "Dropdown closed-state frame. Chevron is baked in the right panel; right nine-slice must stay large so the arrow does not distort. Option list is DOM."
+    },
+    {
+      "id": "progress-track-default",
+      "file": "src/assets/themes/default/frames/progress-track.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/progress-track-original.png",
+      "size": [971, 92],
+      "alphaBBox": [16, 16, 955, 76],
+      "usage": ["progress-track", "slider-track"],
+      "componentTargets": ["GameProgressBar", "GameSlider"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 28,
+        "right": 36,
+        "bottom": 28,
+        "left": 36,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 10,
+        "right": 18,
+        "bottom": 10,
+        "left": 18
+      },
+      "minSize": [120, 24],
+      "forbiddenUses": [
+        "do not bake fill level into the PNG",
+        "do not use as a panel"
+      ],
+      "notes": "Empty gold-bordered progress/slider track. Fill width is controlled by CSS/DOM."
+    },
+    {
+      "id": "progress-thumb-default",
+      "file": "src/assets/themes/default/icons/progress-thumb.png",
+      "type": "icon-button",
+      "sourceFile": "src/assets/raw/progress-thumb-original.png",
+      "size": [249, 291],
+      "alphaBBox": [16, 16, 233, 275],
+      "usage": ["progress-thumb", "slider-thumb"],
+      "componentTargets": ["GameProgressBar", "GameSlider"],
+      "scaling": "fixed",
+      "minSize": [22, 28],
+      "forbiddenUses": [
+        "do not nine-slice stretch this thumb"
+      ],
+      "notes": "Fixed-size champagne/gold slider thumb. Positioned at the fill tip."
+    },
+    {
+      "id": "title-divider-default",
+      "file": "src/assets/themes/default/dividers/title-divider.png",
+      "type": "divider",
+      "sourceFile": "src/assets/raw/title-divider-original.png",
+      "size": [930, 75],
+      "alphaBBox": [16, 16, 914, 59],
+      "usage": ["title-rule", "section-divider"],
+      "componentTargets": ["GameTitleDivider", "GamePanel"],
+      "scaling": "fixed",
+      "minSize": [120, 24],
+      "forbiddenUses": [
+        "do not nine-slice stretch the center ornament alone without side lines"
+      ],
+      "notes": "Full decorative title divider. GameTitleDivider uses center ornament crop + CSS side lines when stretch=true; full asset when stretch=false."
+    },
+    {
+      "id": "title-divider-ornament",
+      "file": "src/assets/themes/default/dividers/title-divider-ornament.png",
+      "type": "divider",
+      "sourceFile": "src/assets/themes/default/dividers/title-divider.png",
+      "size": [140, 75],
+      "usage": ["title-rule-center"],
+      "componentTargets": ["GameTitleDivider"],
+      "scaling": "fixed",
+      "minSize": [80, 20],
+      "forbiddenUses": [],
+      "notes": "Center star ornament cropped from title-divider for stretch layout."
+    },
+    {
+      "id": "icon-button-base-default",
+      "file": "src/assets/themes/default/icons/icon-button-base.png",
+      "type": "icon-button",
+      "sourceFile": "src/assets/raw/icon-button-base-original.png",
+      "size": [420, 422],
+      "alphaBBox": [16, 16, 404, 406],
+      "usage": ["icon-button-base"],
+      "componentTargets": ["GameIconButton"],
+      "scaling": "fixed",
+      "minSize": [44, 44],
+      "forbiddenUses": [
+        "do not nine-slice",
+        "do not bake icons into the base PNG"
+      ],
+      "notes": "Circular metallic button base. Icons are separate DOM/SVG overlays."
+    },
+    {
+      "id": "button-frame-primary",
+      "file": "src/assets/themes/default/frames/button-frame-primary.png",
+      "type": "button-frame",
+      "sourceFile": "src/assets/raw/button-frame-primary-original.png",
+      "size": [933, 224],
+      "usage": ["text-button", "primary"],
+      "componentTargets": ["GameButton"],
+      "scaling": "nine-slice",
+      "nineSlice": { "top": 48, "right": 48, "bottom": 48, "left": 48, "fill": true, "repeat": "stretch" },
+      "safeArea": { "top": 32, "right": 32, "bottom": 32, "left": 32 },
+      "minSize": [120, 48],
+      "forbiddenUses": ["do not use as feature/hero button"],
+      "notes": "Short cream primary button frame."
+    },
+    {
+      "id": "button-frame-disabled",
+      "file": "src/assets/themes/default/frames/button-frame-disabled.png",
+      "type": "button-frame",
+      "sourceFile": "src/assets/raw/button-frame-disabled-original.png",
+      "size": [798, 191],
+      "usage": ["text-button", "disabled"],
+      "componentTargets": ["GameButton"],
+      "scaling": "nine-slice",
+      "nineSlice": { "top": 48, "right": 48, "bottom": 48, "left": 48, "fill": true, "repeat": "stretch" },
+      "minSize": [120, 48],
+      "forbiddenUses": [],
+      "notes": "Short disabled/gray button frame."
+    },
+    {
+      "id": "resource-bar-frame",
+      "file": "src/assets/themes/default/frames/resource-bar-frame.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/resource-bar-frame-original.png",
+      "size": [1013, 166],
+      "usage": ["resource-bar"],
+      "componentTargets": ["GameResourceBar"],
+      "scaling": "nine-slice",
+      "nineSlice": { "top": 40, "right": 40, "bottom": 40, "left": 40, "fill": true, "repeat": "stretch" },
+      "minSize": [320, 64],
+      "forbiddenUses": ["do not use as large content panel"],
+      "notes": "Dedicated narrow resource bar outer frame."
+    },
+    {
+      "id": "resource-item-frame",
+      "file": "src/assets/themes/default/frames/resource-item-frame.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/resource-item-frame-original.png",
+      "size": [702, 208],
+      "usage": ["resource-item"],
+      "componentTargets": ["GameResourceBar"],
+      "scaling": "nine-slice",
+      "nineSlice": { "top": 40, "right": 40, "bottom": 40, "left": 40, "fill": true, "repeat": "stretch" },
+      "minSize": [120, 44],
+      "forbiddenUses": [],
+      "notes": "Single resource chip frame inside the resource bar."
+    },
+    {
+      "id": "select-list-frame",
+      "file": "src/assets/themes/default/frames/select-list-frame.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/select-list-frame-original.png",
+      "size": [350, 541],
+      "usage": ["select-dropdown-panel"],
+      "componentTargets": ["GameSelect"],
+      "scaling": "nine-slice",
+      "nineSlice": { "top": 64, "right": 48, "bottom": 48, "left": 48, "fill": true, "repeat": "stretch" },
+      "minSize": [180, 120],
+      "forbiddenUses": ["do not bake option labels"],
+      "notes": "Expanded dropdown list panel with top tab notch; keep larger top slice."
+    },
+    {
+      "id": "select-option-hover",
+      "file": "src/assets/themes/default/frames/select-option-hover.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/select-option-hover-original.png",
+      "size": [980, 121],
+      "usage": ["select-option-hover"],
+      "componentTargets": ["GameSelect"],
+      "scaling": "nine-slice",
+      "nineSlice": { "top": 36, "right": 48, "bottom": 36, "left": 48, "fill": true, "repeat": "stretch" },
+      "minSize": [120, 36],
+      "forbiddenUses": [],
+      "notes": "Hover/selected highlight strip for dropdown options."
+    }
+  ]
+}

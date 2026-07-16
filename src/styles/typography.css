@@ -1,0 +1,35 @@
+.yp-title {
+  font-family: var(--yp-font-serif);
+  color: var(--yp-color-text-main);
+  letter-spacing: 0.06em;
+  text-shadow: var(--yp-text-glow);
+}
+
+.yp-subtitle {
+  font-family: var(--yp-font-latin);
+  color: var(--yp-color-text-muted);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72em;
+}
+
+.yp-body {
+  font-family: var(--yp-font-sans);
+  color: var(--yp-color-text-muted);
+  line-height: 1.65;
+}
+
+.yp-label {
+  font-family: var(--yp-font-serif);
+  color: var(--yp-color-text-main);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.75);
+}
+
+.yp-caption-latin {
+  font-family: var(--yp-font-latin);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--yp-color-gold-bright);
+  font-size: 0.68em;
+}
