@@ -64,7 +64,7 @@ function onInput(event: Event) {
 .yp-input__frame {
   display: block;
   width: 100%;
-  min-height: 72px;
+  min-height: 68px;
   background: transparent;
 }
 
@@ -74,6 +74,11 @@ function onInput(event: Event) {
   width: 100%;
   min-height: inherit;
   padding: 0 var(--yp-frame-input-safe);
+  border-radius: var(--yp-frame-input-radius);
+  overflow: hidden;
+  transition:
+    filter var(--yp-motion-base),
+    box-shadow var(--yp-motion-base);
 }
 
 .yp-input__control {
@@ -86,6 +91,7 @@ function onInput(event: Event) {
   font-size: 1rem;
   line-height: 1.4;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55);
+  caret-color: var(--yp-color-gold-bright);
 }
 
 .yp-input__control::placeholder {
@@ -95,6 +101,10 @@ function onInput(event: Event) {
 .yp-input__control:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.yp-input__control:focus {
+  outline: none;
 }
 
 .yp-input__hint {
@@ -107,8 +117,18 @@ function onInput(event: Event) {
   opacity: 0.72;
 }
 
+/*
+  Focus hugs the gold trim (asset cropped tight to alpha).
+  Soft inset wash follows the rounded inner fill — no square corners past the frame.
+*/
 .yp-input__frame:focus-within {
-  outline: 2px solid var(--yp-color-gold-bright);
-  outline-offset: 3px;
+  outline: none;
+}
+
+.yp-input__frame:focus-within .yp-input__shell {
+  filter: brightness(1.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(215, 188, 126, 0.4),
+    inset 0 0 12px rgba(184, 149, 98, 0.28);
 }
 </style>

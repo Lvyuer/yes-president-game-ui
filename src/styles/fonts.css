@@ -1,0 +1,5 @@
+/* Match reference HUD: Songti for Chinese, bold sans for data/Latin captions */
+@import "@fontsource/noto-serif-sc/chinese-simplified-400.css";
+@import "@fontsource/noto-serif-sc/chinese-simplified-700.css";
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-700.css";

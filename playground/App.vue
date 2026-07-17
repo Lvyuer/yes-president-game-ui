@@ -15,6 +15,7 @@ import ResourceBarPage from './pages/ResourceBarPage.vue';
 import ActionGridPage from './pages/ActionGridPage.vue';
 import NoticeStackPage from './pages/NoticeStackPage.vue';
 import DashboardPage from './pages/DashboardPage.vue';
+import MainLoopPage from './pages/MainLoopPage.vue';
 
 const pageMap = {
   overview: OverviewPage,
@@ -31,6 +32,7 @@ const pageMap = {
   'action-grid': ActionGridPage,
   'notice-stack': NoticeStackPage,
   dashboard: DashboardPage,
+  'main-loop': MainLoopPage,
 } as const;
 
 type PageId = keyof typeof pageMap;
@@ -54,6 +56,7 @@ function navigate(id: string) {
 
 const currentPage = computed(() => pageMap[currentId.value]);
 const currentMeta = computed(() => docsNav.find((item) => item.id === currentId.value));
+const isFullscreenPreview = computed(() => currentId.value === 'main-loop');
 
 const groupedNav = computed(() => {
   const groups: DocsNavItem['group'][] = ['guide', 'components', 'layouts'];
@@ -75,8 +78,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="docs-shell yp-theme-default">
-    <aside class="docs-shell__sidebar">
+  <div
+    class="docs-shell yp-theme-default"
+    :class="{ 'docs-shell--fullscreen': isFullscreenPreview }"
+  >
+    <aside v-if="!isFullscreenPreview" class="docs-shell__sidebar">
       <div class="docs-shell__brand">
         <p class="docs-shell__brand-en">YES PRESIDENT</p>
         <h1 class="docs-shell__brand-title">Game UI</h1>
@@ -102,8 +108,8 @@ onUnmounted(() => {
       </nav>
     </aside>
 
-    <main class="docs-shell__main">
-      <div class="docs-shell__crumb" v-if="currentMeta">
+    <main class="docs-shell__main" :class="{ 'docs-shell__main--fullscreen': isFullscreenPreview }">
+      <div class="docs-shell__crumb" v-if="currentMeta && !isFullscreenPreview">
         {{ groupLabels[currentMeta.group] }} / {{ currentMeta.label }}
       </div>
       <component :is="currentPage" />
@@ -125,6 +131,10 @@ body,
   grid-template-columns: 260px minmax(0, 1fr);
   min-height: 100vh;
   color: var(--yp-color-text-main);
+}
+
+.docs-shell--fullscreen {
+  grid-template-columns: 1fr;
 }
 
 .docs-shell__sidebar {
@@ -232,6 +242,12 @@ body,
     radial-gradient(ellipse at 80% 0%, rgba(184, 149, 98, 0.09), transparent 42%),
     radial-gradient(ellipse at 10% 100%, rgba(40, 48, 54, 0.45), transparent 50%),
     #050607;
+}
+
+.docs-shell__main--fullscreen {
+  padding: 0;
+  background: #050607;
+  min-height: 100vh;
 }
 
 .docs-shell__crumb {

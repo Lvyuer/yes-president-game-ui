@@ -1,6 +1,8 @@
 .yp-framed {
   position: relative;
   isolation: isolate;
+  /* PNG frames are rounded; keep CSS fill/shadow from poking out as a square plate */
+  background-clip: padding-box;
 }
 
 .yp-framed::after {
@@ -14,10 +16,18 @@
   border-image-repeat: stretch;
 }
 
+.yp-framed--panel {
+  border-radius: var(--yp-frame-panel-radius);
+}
+
 .yp-framed--panel::after {
   border-width: var(--yp-frame-panel-width);
   border-image-source: var(--yp-frame-panel);
   border-image-slice: var(--yp-frame-panel-slice) fill;
+}
+
+.yp-framed--button {
+  border-radius: var(--yp-frame-button-radius);
 }
 
 .yp-framed--button::after {
@@ -26,10 +36,18 @@
   border-image-slice: var(--yp-frame-button-slice) fill;
 }
 
+.yp-framed--notice {
+  border-radius: var(--yp-frame-notice-radius);
+}
+
 .yp-framed--notice::after {
   border-width: var(--yp-frame-notice-width);
   border-image-source: var(--yp-frame-notice);
   border-image-slice: var(--yp-frame-notice-slice) fill;
+}
+
+.yp-framed--input {
+  border-radius: var(--yp-frame-input-radius);
 }
 
 .yp-framed--input::after {
@@ -38,10 +56,19 @@
   border-image-slice: var(--yp-frame-input-slice) fill;
 }
 
+.yp-framed--select {
+  border-radius: var(--yp-frame-select-radius);
+}
+
 .yp-framed--select::after {
   border-width: var(--yp-frame-select-width);
   border-image-source: var(--yp-frame-select);
   border-image-slice: var(--yp-frame-select-slice) fill;
+}
+
+.yp-framed--button-sm,
+.yp-framed--button-sm-disabled {
+  border-radius: var(--yp-frame-button-sm-radius);
 }
 
 .yp-framed--button-sm::after {
@@ -51,9 +78,13 @@
 }
 
 .yp-framed--button-sm-disabled::after {
-  border-width: var(--yp-frame-button-sm-width);
+  border-width: var(--yp-frame-button-sm-disabled-width);
   border-image-source: var(--yp-frame-button-disabled);
-  border-image-slice: var(--yp-frame-button-sm-slice) fill;
+  border-image-slice: var(--yp-frame-button-sm-disabled-slice) fill;
+}
+
+.yp-framed--resource-bar {
+  border-radius: var(--yp-frame-resource-bar-radius);
 }
 
 .yp-framed--resource-bar::after {
@@ -62,10 +93,18 @@
   border-image-slice: var(--yp-frame-resource-bar-slice) fill;
 }
 
+.yp-framed--resource-item {
+  border-radius: var(--yp-frame-resource-item-radius);
+}
+
 .yp-framed--resource-item::after {
   border-width: var(--yp-frame-resource-item-width);
   border-image-source: var(--yp-frame-resource-item);
   border-image-slice: var(--yp-frame-resource-item-slice) fill;
+}
+
+.yp-framed--select-list {
+  border-radius: var(--yp-frame-select-list-radius);
 }
 
 .yp-framed--select-list::after {
@@ -81,18 +120,52 @@
 
 .yp-interactive {
   transition:
-    filter var(--yp-motion-fast),
     opacity var(--yp-motion-fast),
-    transform var(--yp-motion-fast);
+    transform var(--yp-motion-fast),
+    box-shadow var(--yp-motion-fast);
 }
 
-.yp-interactive:hover:not(:disabled) {
+/* Non-framed controls (e.g. icon-button): filter on host is fine */
+.yp-interactive:not(.yp-framed) {
+  transition:
+    filter var(--yp-motion-fast),
+    opacity var(--yp-motion-fast),
+    transform var(--yp-motion-fast),
+    box-shadow var(--yp-motion-fast);
+}
+
+.yp-interactive:not(.yp-framed):hover:not(:disabled) {
   filter: brightness(1.08);
 }
 
-.yp-interactive:active:not(:disabled) {
+.yp-interactive:not(.yp-framed):active:not(:disabled) {
   filter: brightness(0.94);
   transform: translateY(1px);
+}
+
+.yp-interactive:not(.yp-framed):focus-visible {
+  outline: none;
+  filter: brightness(1.1);
+  box-shadow:
+    0 0 0 1px rgba(215, 188, 126, 0.45),
+    0 0 12px rgba(184, 149, 98, 0.28);
+}
+
+/* Framed controls: brightness on content only — keep ::after border-image sharp */
+.yp-interactive.yp-framed .yp-framed__content {
+  transition: filter var(--yp-motion-fast);
+}
+
+.yp-interactive.yp-framed:hover:not(:disabled) .yp-framed__content {
+  filter: brightness(1.08);
+}
+
+.yp-interactive.yp-framed:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.yp-interactive.yp-framed:active:not(:disabled) .yp-framed__content {
+  filter: brightness(0.94);
 }
 
 .yp-interactive:disabled {
@@ -100,7 +173,14 @@
   cursor: not-allowed;
 }
 
-.yp-interactive:focus-visible {
-  outline: 2px solid var(--yp-color-gold-bright);
-  outline-offset: 3px;
+/* Soft rounded focus — never a hard square outline past the gold frame */
+.yp-interactive.yp-framed:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(215, 188, 126, 0.45),
+    0 0 12px rgba(184, 149, 98, 0.28);
+}
+
+.yp-interactive.yp-framed:focus-visible .yp-framed__content {
+  filter: brightness(1.1);
 }

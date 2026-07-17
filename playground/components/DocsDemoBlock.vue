@@ -58,6 +58,7 @@ defineProps<{
 
 .docs-demo__preview {
   padding: 28px 24px;
+  overflow: visible;
   background:
     radial-gradient(circle at 15% 0%, rgba(184, 149, 98, 0.08), transparent 42%),
     rgba(4, 6, 8, 0.72);

@@ -50,7 +50,9 @@ const props = withDefaults(
 <style scoped>
 .yp-panel {
   color: var(--yp-color-text-main);
-  background: var(--yp-color-surface);
+  /* fill comes from border-image (rounded). Solid CSS bg leaks square corners. */
+  background: transparent;
+  border-radius: var(--yp-frame-panel-radius);
   box-shadow: var(--yp-shadow-panel);
 }
 

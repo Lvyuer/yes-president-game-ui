@@ -30,12 +30,15 @@
     "build:lib": "vue-tsc --noEmit && vite build",
     "build:docs": "vue-tsc --noEmit && cross-env GITHUB_PAGES=true vite build --config vite.config.playground.ts",
     "preview": "vite preview --config vite.config.playground.ts",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "check:hud": "node scripts/check-hud-tokens.mjs"
   },
   "peerDependencies": {
     "vue": ">=3.4.0"
   },
   "devDependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/noto-serif-sc": "^5.2.8",
     "@vitejs/plugin-vue": "^6.0.8",
     "cross-env": "^7.0.3",
     "typescript": "^5.9.3",

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed } from 'vue';
 import type { GameProgressBarProps } from '../types';
 
@@ -33,12 +33,18 @@ const displayValue = computed(() => `${Math.round(percent.value)}%`);
     >
       <div
         class="yp-progress__fill"
-        :style="{ width: `calc((100% - 20px) * ${percent} / 100)` }"
+        :style="{
+          width: percent > 0
+            ? `calc((100% - var(--yp-progress-fill-offset)) * ${percent} / 100)`
+            : '0',
+        }"
       />
       <span
         v-if="props.showThumb"
         class="yp-progress__thumb"
-        :style="{ left: `calc(10px + (100% - 20px) * ${percent} / 100)` }"
+        :style="{
+          left: `clamp(calc(4px + var(--yp-progress-fill-offset)), calc(var(--yp-progress-fill-offset) + var(--yp-progress-thumb-nudge) + (100% - var(--yp-progress-fill-offset) - var(--yp-progress-thumb-nudge)) * ${percent} / 100), calc(100% - var(--yp-progress-thumb-end)))`,
+        }"
         aria-hidden="true"
       />
     </div>
@@ -50,6 +56,8 @@ const displayValue = computed(() => `${Math.round(percent.value)}%`);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  /* allow value to hang past the track tip */
+  overflow: visible;
 }
 
 .yp-progress__header {
@@ -57,21 +65,41 @@ const displayValue = computed(() => `${Math.round(percent.value)}%`);
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
+  /* match track horizontal box so % lines up with the bar tip */
+  margin-left: var(--yp-progress-track-shift);
+  width: calc(100% - var(--yp-progress-track-shift));
+  padding-right: 0;
+  box-sizing: border-box;
   font-family: var(--yp-font-sans);
   font-size: 0.9rem;
   color: var(--yp-color-text-muted);
+  overflow: visible;
+}
+
+.yp-progress__label {
+  flex: 1;
+  min-width: 0;
 }
 
 .yp-progress__value {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
   font-family: var(--yp-font-latin);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   color: var(--yp-color-gold-bright);
+  text-align: right;
+  /* sit past the thumb / at the outer tip of the track */
+  transform: translateX(22px);
 }
 
 .yp-progress__track {
   position: relative;
-  height: 28px;
+  height: 44px;
   box-sizing: border-box;
+  margin-left: var(--yp-progress-track-shift);
+  width: calc(100% - var(--yp-progress-track-shift));
+  border-radius: var(--yp-frame-progress-radius);
   border-style: solid;
   border-color: transparent;
   border-width: var(--yp-frame-progress-width);
@@ -79,12 +107,13 @@ const displayValue = computed(() => `${Math.round(percent.value)}%`);
   border-image-slice: var(--yp-frame-progress-slice) fill;
   border-image-repeat: stretch;
   background: transparent;
+  overflow: visible;
 }
 
 .yp-progress__fill {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: var(--yp-progress-fill-offset);
   height: 10px;
   transform: translateY(-50%);
   border-radius: 2px;

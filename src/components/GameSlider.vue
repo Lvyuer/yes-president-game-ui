@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 const props = withDefaults(
@@ -49,8 +49,16 @@ function valueFromClientX(clientX: number) {
   const el = trackRef.value;
   if (!el) return props.modelValue;
   const rect = el.getBoundingClientRect();
-  const ratio = rect.width > 0 ? (clientX - rect.left) / rect.width : 0;
-  const raw = props.min + ratio * (props.max - props.min);
+  // Match visual thumb travel: left fill-offset+nudge → right edge + end inset
+  const styles = getComputedStyle(el);
+  const fillOffset = Number.parseFloat(styles.getPropertyValue('--yp-progress-fill-offset')) || 0;
+  const nudge = Number.parseFloat(styles.getPropertyValue('--yp-progress-thumb-nudge')) || 0;
+  const endInset = Number.parseFloat(styles.getPropertyValue('--yp-progress-thumb-end')) || 0;
+  const start = fillOffset + nudge;
+  const end = rect.width - endInset;
+  const span = Math.max(1, end - start);
+  const ratio = (clientX - rect.left - start) / span;
+  const raw = props.min + Math.min(1, Math.max(0, ratio)) * (props.max - props.min);
   return snap(raw);
 }
 
@@ -118,8 +126,20 @@ function onKeydown(event: KeyboardEvent) {
       @pointercancel="onPointerUp"
       @keydown="onKeydown"
     >
-      <div class="yp-slider__fill" :style="{ width: `calc((100% - 20px) * ${percent} / 100)` }" />
-      <span class="yp-slider__thumb" :style="{ left: `calc(10px + (100% - 20px) * ${percent} / 100)` }" />
+      <div
+        class="yp-slider__fill"
+        :style="{
+          width: percent > 0
+            ? `calc((100% - var(--yp-progress-fill-offset)) * ${percent} / 100)`
+            : '0',
+        }"
+      />
+      <span
+        class="yp-slider__thumb"
+        :style="{
+          left: `clamp(calc(4px + var(--yp-progress-fill-offset)), calc(var(--yp-progress-fill-offset) + var(--yp-progress-thumb-nudge) + (100% - var(--yp-progress-fill-offset) - var(--yp-progress-thumb-nudge)) * ${percent} / 100), calc(100% - var(--yp-progress-thumb-end)))`,
+        }"
+      />
     </div>
   </div>
 </template>
@@ -139,21 +159,33 @@ function onKeydown(event: KeyboardEvent) {
   display: flex;
   justify-content: space-between;
   gap: 12px;
+  margin-left: var(--yp-progress-track-shift);
+  width: calc(100% - var(--yp-progress-track-shift));
+  box-sizing: border-box;
   font-family: var(--yp-font-sans);
   font-size: 0.9rem;
   color: var(--yp-color-text-muted);
+  overflow: visible;
 }
 
 .yp-slider__value {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
   font-family: var(--yp-font-latin);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   color: var(--yp-color-gold-bright);
+  text-align: right;
+  transform: translateX(22px);
 }
 
 .yp-slider__track {
   position: relative;
-  height: 32px;
+  height: 48px;
   box-sizing: border-box;
+  margin-left: var(--yp-progress-track-shift);
+  width: calc(100% - var(--yp-progress-track-shift));
+  border-radius: var(--yp-frame-progress-radius);
   border-style: solid;
   border-color: transparent;
   border-width: var(--yp-frame-progress-width);
@@ -165,14 +197,16 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 .yp-slider__track:focus-visible {
-  outline: 2px solid var(--yp-color-gold-bright);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(215, 188, 126, 0.4),
+    0 0 10px rgba(184, 149, 98, 0.25);
 }
 
 .yp-slider__fill {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: var(--yp-progress-fill-offset);
   height: 10px;
   transform: translateY(-50%);
   border-radius: 2px;

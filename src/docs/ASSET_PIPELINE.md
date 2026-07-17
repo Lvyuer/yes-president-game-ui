@@ -57,11 +57,32 @@ print("alpha bbox", alpha.getbbox())
 - 大功能按钮：360 × 236
 - 窄按钮：220 × 140
 
+裁切脚本只负责 alpha 边界、尺寸和透明边报告。`border-image-slice`
+必须在 playground 中按完整角饰范围手工确定，不能直接采用纹理检测或自动估算值。
+
 调 `border-image-slice` 直到：
 
 - 四角不变形
 - 四边不断裂
 - 中央内容区无裂缝
+- 所有角饰完全落在四角 slice 中，不进入 stretch 边条
+- 内嵌箭头、顶部凸起等居中装饰已拆成固定覆盖层
+
+### 九宫格锐度规则（必守）
+
+`border-image-slice` 是源图保护区，CSS `border-width` 是目标显示宽度；
+二者必须分开设计：
+
+| 规则 | 说明 |
+|------|------|
+| **禁止上采样** | 任意边的 `border-width` 必须 ≤ 对应 `slice` 像素，否则金线被拉伸发糊 |
+| **保护完整角饰** | slice 必须覆盖圆角、折线、星形、端帽等全部不可拉伸图案 |
+| **显示宽度独立** | 4K 素材不能套用 `slice ÷ 2`；border-width 按组件目标高度和视觉厚度设置 |
+| **特殊装饰拆层** | 居中 tab、箭头、徽章等不能进入 stretch 区，必须使用固定覆盖层 |
+| **几何约束** | 组件 `height` / `min-height` 必须 ≥ 上下 `border-width` 之和 + 内容区最小高度；禁止只压 `height` 不改 slice/width |
+| **filter 隔离** | 交互 `brightness` / `sepia` 等滤镜只作用在 `.yp-framed__content` 或内层，不要加在带 `::after` 边框的宿主上 |
+
+写入 `tokens.css` 时在注释中标明素材尺寸与目标比例，便于后续校对。
 
 ## 6. 写入 Manifest
 
@@ -93,8 +114,8 @@ print("alpha bbox", alpha.getbbox())
 3. 裁切
 4. 分类
 5. 最小测试页
-6. 三种尺寸测试
-7. 调整 border-image-slice
+6. 三种尺寸测试（DPR 1 / DPR 2）
+7. 人工调整 border-image-slice 与独立 border-width
 8. 写入 manifest
 9. 抽象 Vue 组件
 10. playground 示例

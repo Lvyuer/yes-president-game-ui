@@ -22,8 +22,9 @@ const props = withDefaults(defineProps<GameNoticeProps>(), {
 <style scoped>
 .yp-notice {
   min-width: 320px;
-  min-height: 96px;
+  min-height: 112px;
   background: transparent;
+  border-radius: var(--yp-frame-notice-radius);
 }
 
 .yp-notice__inner {

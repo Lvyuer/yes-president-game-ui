@@ -7,9 +7,10 @@
 - [ ] 大、中、小尺寸不破边
 - [ ] 角饰不拉伸变形
 - [ ] 文本不和花纹、边框、图标重叠
-- [ ] 字体风格与参考图一致（宋体标题、窄体英文副标题）
+- [ ] 字体风格与参考图一致（中文宋体 / Noto Serif SC；数值 Inter Bold；英文副标题 Inter）
 - [ ] PNG 没有白边、黑边、脏边
 - [ ] 内容区没有平铺裂缝
+- [ ] 主循环资源条：标签在上、数值在下，无趋势箭头（见 `HUD_LAYOUT.md`）
 
 ## 功能检查
 
@@ -36,7 +37,7 @@
 | GameFeatureButton | button-frame 九宫格 | 已验收（待视觉截图） |
 | GamePanel | panel-frame 九宫格 | 已验收（待视觉截图） |
 | GameNotice | panel-frame 压缩 | 已验收 |
-| GameResourceBar | panel-frame 窄条 | 已验收 |
+| GameResourceBar | resource-bar 九宫格 | 已验收；主循环无趋势 |
 | GameButton | CSS 临时边框 | 临时，等矮按钮框 PNG |
 | GameIconButton | 占位 SVG | 已验收 |
 | GameProgressBar | CSS 轨道 | 临时，等进度条 PNG |

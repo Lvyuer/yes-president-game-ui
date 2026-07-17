@@ -1,23 +1,27 @@
+@import "./fonts.css";
 @import "./reset.css";
 @import "./tokens.css";
 @import "./typography.css";
 @import "./effects.css";
 
 :root {
-  --yp-frame-panel: url("../assets/themes/default/frames/panel-frame.png");
-  --yp-frame-button: url("../assets/themes/default/frames/button-frame.png");
-  --yp-frame-notice: url("../assets/themes/default/frames/notice-frame.png");
-  --yp-frame-input: url("../assets/themes/default/frames/input-frame.png");
-  --yp-frame-select: url("../assets/themes/default/frames/select-frame.png");
-  --yp-frame-progress: url("../assets/themes/default/frames/progress-track.png");
-  --yp-progress-thumb: url("../assets/themes/default/icons/progress-thumb.png");
-  --yp-divider-title: url("../assets/themes/default/dividers/title-divider.png");
-  --yp-divider-title-ornament: url("../assets/themes/default/dividers/title-divider-ornament.png");
-  --yp-icon-button-base: url("../assets/themes/default/icons/icon-button-base.png");
-  --yp-frame-button-primary: url("../assets/themes/default/frames/button-frame-primary.png");
-  --yp-frame-button-disabled: url("../assets/themes/default/frames/button-frame-disabled.png");
-  --yp-frame-resource-bar: url("../assets/themes/default/frames/resource-bar-frame.png");
-  --yp-frame-resource-item: url("../assets/themes/default/frames/resource-item-frame.png");
-  --yp-frame-select-list: url("../assets/themes/default/frames/select-list-frame.png");
-  --yp-frame-select-hover: url("../assets/themes/default/frames/select-option-hover.png");
+  --yp-frame-panel: url("../assets/themes/default/frames/面板边框.png");
+  --yp-frame-button: url("../assets/themes/default/frames/功能按钮边框.png");
+  --yp-frame-notice: url("../assets/themes/default/frames/通知边框.png");
+  --yp-frame-input: url("../assets/themes/default/frames/输入框边框.png");
+  --yp-frame-select: url("../assets/themes/default/frames/下拉框基础边框.png");
+  --yp-frame-progress: url("../assets/themes/default/frames/进度条轨道.png");
+  --yp-progress-thumb: url("../assets/themes/default/icons/进度条滑块.png");
+  --yp-divider-title: url("../assets/themes/default/dividers/标题分割线.png");
+  /* 装饰线暂缺独立素材时复用标题分割线 */
+  --yp-divider-title-ornament: url("../assets/themes/default/dividers/标题分割线.png");
+  --yp-icon-button-base: url("../assets/themes/default/icons/图标按钮底座.png");
+  --yp-frame-button-primary: url("../assets/themes/default/frames/主按钮边框.png");
+  --yp-frame-button-disabled: url("../assets/themes/default/frames/禁用按钮边框.png");
+  --yp-frame-resource-bar: url("../assets/themes/default/frames/资源条边框.png");
+  /* 资源项暂缺独立素材时使用较轻的面板框。 */
+  --yp-frame-resource-item: url("../assets/themes/default/frames/面板边框.png");
+  --yp-frame-select-list: url("../assets/themes/default/frames/下拉列表基础边框.png");
+  --yp-select-list-ornament: url("../assets/themes/default/frames/下拉列表顶部装饰.png");
+  --yp-frame-select-hover: url("../assets/themes/default/frames/下拉选项悬停.png");
 }

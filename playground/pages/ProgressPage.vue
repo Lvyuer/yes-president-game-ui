@@ -76,6 +76,8 @@ const sliderApi = [
   flex-direction: column;
   gap: 16px;
   max-width: 480px;
+  padding-right: 28px;
+  box-sizing: content-box;
 }
 
 .row {

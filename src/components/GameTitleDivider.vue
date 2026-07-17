@@ -68,8 +68,8 @@ withDefaults(
 
 .yp-title-divider__ornament {
   flex: 0 0 auto;
-  width: 120px;
-  height: 28px;
+  width: 110px;
+  height: 24px;
   background: var(--yp-divider-title-ornament) center / contain no-repeat;
 }
 

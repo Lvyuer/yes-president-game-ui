@@ -1,369 +1,640 @@
 {
-  "version": "1.7.0",
+  "version": "2.0.0",
   "theme": "default",
   "assets": [
     {
       "id": "button-frame-default",
-      "file": "src/assets/themes/default/frames/button-frame.png",
+      "file": "src/assets/themes/default/frames/功能按钮边框.png",
       "type": "button-frame",
-      "sourceFile": "src/assets/raw/button-frame-original.png",
-      "size": [860, 390],
-      "alphaBBox": [82, 88, 778, 302],
-      "usage": ["feature-button", "hero-action", "wide-action"],
-      "componentTargets": ["GameFeatureButton"],
+      "sourceFile": "src/assets/raw/功能按钮边框-原图.png",
+      "size": [
+        3547,
+        1233
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        3523,
+        1209
+      ],
+      "usage": [
+        "feature-button",
+        "hero-action",
+        "wide-action"
+      ],
+      "componentTargets": [
+        "GameFeatureButton"
+      ],
       "scaling": "nine-slice",
       "nineSlice": {
-        "top": 93,
-        "right": 93,
-        "bottom": 93,
-        "left": 93,
+        "top": 220,
+        "right": 220,
+        "bottom": 220,
+        "left": 220,
         "fill": true,
         "repeat": "stretch"
       },
       "safeArea": {
-        "top": 56,
-        "right": 56,
-        "bottom": 56,
-        "left": 56
+        "top": 28,
+        "right": 28,
+        "bottom": 28,
+        "left": 28
       },
-      "minSize": [220, 120],
+      "minSize": [
+        240,
+        160
+      ],
       "forbiddenUses": [
         "do not use as a small text button",
         "do not bake labels into the PNG",
         "do not shrink below 220px width"
       ],
-      "notes": "v1 dark leather feature button frame with gold corners and star ornaments."
-    },
-    {
-      "id": "button-frame-cream",
-      "file": "src/assets/themes/default/frames/button-frame-cream.png",
-      "type": "button-frame",
-      "sourceFile": "src/assets/raw/button-frame-cream-original.png",
-      "size": [820, 263],
-      "alphaBBox": [24, 24, 796, 239],
-      "usage": ["text-button", "confirm-button"],
-      "componentTargets": ["GameButton"],
-      "scaling": "nine-slice",
-      "nineSlice": {
-        "top": 56,
-        "right": 56,
-        "bottom": 56,
-        "left": 56,
-        "fill": true,
-        "repeat": "stretch"
-      },
-      "safeArea": {
-        "top": 48,
-        "right": 48,
-        "bottom": 48,
-        "left": 48
-      },
-      "minSize": [200, 100],
-      "forbiddenUses": [
-        "do not bake labels into the PNG"
-      ],
-      "notes": "Cream-fill gold/black frame. Reserved for GameButton."
+      "notes": "High-resolution feature button frame. Slice protects the complete Art Deco corner ornaments; CSS border width controls display scale."
     },
     {
       "id": "panel-frame-default",
-      "file": "src/assets/themes/default/frames/panel-frame.png",
+      "file": "src/assets/themes/default/frames/面板边框.png",
       "type": "panel-frame",
-      "sourceFile": "src/assets/raw/panel-frame-original.png",
-      "size": [910, 340],
-      "alphaBBox": [24, 24, 886, 316],
-      "usage": ["large-panel", "medium-card", "resource-bar"],
-      "componentTargets": ["GamePanel", "GameResourceBar"],
+      "sourceFile": "src/assets/raw/面板边框-原图.png",
+      "size": [
+        2834,
+        1322
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        2810,
+        1298
+      ],
+      "usage": [
+        "large-panel",
+        "medium-card",
+        "resource-bar"
+      ],
+      "componentTargets": [
+        "GamePanel",
+        "MainHud resource-item fallback"
+      ],
       "scaling": "nine-slice",
       "nineSlice": {
-        "top": 48,
-        "right": 48,
-        "bottom": 48,
-        "left": 48,
+        "top": 180,
+        "right": 180,
+        "bottom": 180,
+        "left": 180,
         "fill": true,
         "repeat": "stretch"
       },
       "safeArea": {
-        "top": 40,
-        "right": 40,
-        "bottom": 40,
-        "left": 40
+        "top": 32,
+        "right": 32,
+        "bottom": 32,
+        "left": 32
       },
-      "minSize": [280, 120],
+      "minSize": [
+        320,
+        120
+      ],
       "forbiddenUses": [
         "do not use as a small text button",
         "do not bake labels into the PNG"
       ],
-      "notes": "General large panel frame — dark leather, gold double border with corner arcs."
+      "notes": "High-resolution general panel frame. Also used with lighter border-width as the temporary MainHud resource-item frame."
     },
     {
       "id": "notice-frame-default",
-      "file": "src/assets/themes/default/frames/notice-frame.png",
+      "file": "src/assets/themes/default/frames/通知边框.png",
       "type": "panel-frame",
-      "sourceFile": "src/assets/raw/notice-frame-original.png",
-      "size": [938, 363],
-      "alphaBBox": [24, 24, 914, 339],
-      "usage": ["notice", "alert-bar", "toast-strip"],
-      "componentTargets": ["GameNotice", "NoticeStack"],
+      "sourceFile": "src/assets/raw/通知边框-原图.png",
+      "size": [
+        3586,
+        1010
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        3562,
+        986
+      ],
+      "usage": [
+        "notice",
+        "alert-bar",
+        "toast-strip"
+      ],
+      "componentTargets": [
+        "GameNotice",
+        "NoticeStack"
+      ],
       "scaling": "nine-slice",
       "nineSlice": {
-        "top": 72,
-        "right": 72,
-        "bottom": 72,
-        "left": 72,
+        "top": 190,
+        "right": 170,
+        "bottom": 190,
+        "left": 170,
         "fill": true,
         "repeat": "stretch"
       },
       "safeArea": {
-        "top": 40,
-        "right": 40,
-        "bottom": 40,
-        "left": 40
+        "top": 24,
+        "right": 24,
+        "bottom": 24,
+        "left": 24
       },
-      "minSize": [280, 88],
+      "minSize": [
+        320,
+        112
+      ],
       "forbiddenUses": [
         "do not bake labels into the PNG",
         "do not use as a large content panel"
       ],
-      "notes": "Notification bar frame with gold double border and geometric corner notches."
+      "notes": "Notification bar frame with gold double border and geometric corner notches. Cropped tight to alpha bbox."
     },
     {
       "id": "input-frame-default",
-      "file": "src/assets/themes/default/frames/input-frame.png",
+      "file": "src/assets/themes/default/frames/输入框边框.png",
       "type": "panel-frame",
-      "sourceFile": "src/assets/raw/input-frame-original.png",
-      "size": [800, 252],
-      "alphaBBox": [24, 24, 776, 228],
-      "usage": ["text-input", "field"],
-      "componentTargets": ["GameInput"],
+      "sourceFile": "src/assets/raw/输入框边框-原图.png",
+      "size": [
+        3575,
+        525
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        3551,
+        501
+      ],
+      "usage": [
+        "text-input",
+        "field"
+      ],
+      "componentTargets": [
+        "GameInput"
+      ],
       "scaling": "nine-slice",
       "nineSlice": {
-        "top": 72,
-        "right": 72,
-        "bottom": 72,
-        "left": 72,
+        "top": 180,
+        "right": 190,
+        "bottom": 180,
+        "left": 190,
         "fill": true,
         "repeat": "stretch"
       },
       "safeArea": {
-        "top": 40,
-        "right": 40,
-        "bottom": 40,
-        "left": 40
+        "top": 24,
+        "right": 24,
+        "bottom": 24,
+        "left": 24
       },
-      "minSize": [200, 64],
+      "minSize": [
+        240,
+        68
+      ],
       "forbiddenUses": [
         "do not bake placeholder text into the PNG"
       ],
-      "notes": "Input field frame — dark fill, gold double border with corner flourishes. Native input is DOM."
+      "notes": "Input field frame — cropped tight to alpha (was 24px transparent pad). Native input is DOM."
     },
     {
       "id": "select-frame-default",
-      "file": "src/assets/themes/default/frames/select-frame.png",
+      "file": "src/assets/themes/default/frames/下拉框基础边框.png",
       "type": "button-frame",
-      "sourceFile": "src/assets/raw/select-frame-original.png",
-      "size": [844, 174],
-      "alphaBBox": [24, 24, 820, 150],
-      "usage": ["select", "dropdown"],
-      "componentTargets": ["GameSelect"],
+      "sourceFile": "src/assets/raw/下拉框边框-原图.png",
+      "size": [
+        3001,
+        454
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        2977,
+        430
+      ],
+      "usage": [
+        "select",
+        "dropdown"
+      ],
+      "componentTargets": [
+        "GameSelect"
+      ],
       "scaling": "nine-slice",
       "nineSlice": {
-        "top": 48,
-        "right": 126,
-        "bottom": 48,
-        "left": 48,
+        "top": 130,
+        "right": 140,
+        "bottom": 130,
+        "left": 140,
         "fill": true,
         "repeat": "stretch"
       },
       "safeArea": {
-        "top": 28,
+        "top": 16,
         "right": 72,
-        "bottom": 28,
-        "left": 28
+        "bottom": 16,
+        "left": 24
       },
-      "minSize": [220, 56],
+      "minSize": [
+        240,
+        72
+      ],
       "forbiddenUses": [
         "do not bake option labels into the PNG",
-        "do not stretch the right chevron panel — keep large right slice"
+        "arrow and separator are CSS overlays; do not bake them into this base frame"
       ],
-      "notes": "Dropdown closed-state frame. Chevron is baked in the right panel; right nine-slice must stay large so the arrow does not distort. Option list is DOM."
+      "notes": "Symmetric derived base frame. The arrow and separator are rendered independently by GameSelect so they never enter a stretched slice."
     },
     {
       "id": "progress-track-default",
-      "file": "src/assets/themes/default/frames/progress-track.png",
+      "file": "src/assets/themes/default/frames/进度条轨道.png",
       "type": "panel-frame",
-      "sourceFile": "src/assets/raw/progress-track-original.png",
-      "size": [971, 92],
-      "alphaBBox": [16, 16, 955, 76],
-      "usage": ["progress-track", "slider-track"],
-      "componentTargets": ["GameProgressBar", "GameSlider"],
+      "sourceFile": "src/assets/raw/进度条轨道-原图.png",
+      "size": [
+        3353,
+        325
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        3329,
+        301
+      ],
+      "usage": [
+        "progress-track",
+        "slider-track"
+      ],
+      "componentTargets": [
+        "GameProgressBar",
+        "GameSlider"
+      ],
       "scaling": "nine-slice",
       "nineSlice": {
-        "top": 28,
-        "right": 36,
-        "bottom": 28,
-        "left": 36,
+        "top": 110,
+        "right": 160,
+        "bottom": 110,
+        "left": 160,
         "fill": true,
         "repeat": "stretch"
       },
       "safeArea": {
         "top": 10,
-        "right": 18,
+        "right": 24,
         "bottom": 10,
-        "left": 18
+        "left": 24
       },
-      "minSize": [120, 24],
+      "minSize": [
+        140,
+        44
+      ],
       "forbiddenUses": [
         "do not bake fill level into the PNG",
         "do not use as a panel"
       ],
-      "notes": "Empty gold-bordered progress/slider track. Fill width is controlled by CSS/DOM."
+      "notes": "Empty gold-bordered progress/slider track. Fill width is controlled by CSS/DOM. Cropped tight to alpha bbox."
     },
     {
       "id": "progress-thumb-default",
-      "file": "src/assets/themes/default/icons/progress-thumb.png",
+      "file": "src/assets/themes/default/icons/进度条滑块.png",
       "type": "icon-button",
-      "sourceFile": "src/assets/raw/progress-thumb-original.png",
-      "size": [249, 291],
-      "alphaBBox": [16, 16, 233, 275],
-      "usage": ["progress-thumb", "slider-thumb"],
-      "componentTargets": ["GameProgressBar", "GameSlider"],
+      "sourceFile": "src/assets/raw/进度条滑块-原图.png",
+      "size": [
+        1070,
+        1236
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        1046,
+        1212
+      ],
+      "usage": [
+        "progress-thumb",
+        "slider-thumb"
+      ],
+      "componentTargets": [
+        "GameProgressBar",
+        "GameSlider"
+      ],
       "scaling": "fixed",
-      "minSize": [22, 28],
+      "minSize": [
+        22,
+        28
+      ],
       "forbiddenUses": [
         "do not nine-slice stretch this thumb"
       ],
-      "notes": "Fixed-size champagne/gold slider thumb. Positioned at the fill tip."
+      "notes": "Fixed-size champagne/gold slider thumb. Positioned at the fill tip. Cropped tight to alpha bbox."
     },
     {
       "id": "title-divider-default",
-      "file": "src/assets/themes/default/dividers/title-divider.png",
+      "file": "src/assets/themes/default/dividers/标题分割线.png",
       "type": "divider",
-      "sourceFile": "src/assets/raw/title-divider-original.png",
-      "size": [930, 75],
-      "alphaBBox": [16, 16, 914, 59],
-      "usage": ["title-rule", "section-divider"],
-      "componentTargets": ["GameTitleDivider", "GamePanel"],
+      "sourceFile": "src/assets/raw/标题分割线-原图.png",
+      "size": [
+        3418,
+        111
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        3394,
+        87
+      ],
+      "usage": [
+        "title-rule",
+        "section-divider"
+      ],
+      "componentTargets": [
+        "GameTitleDivider",
+        "GamePanel"
+      ],
       "scaling": "fixed",
-      "minSize": [120, 24],
+      "minSize": [
+        120,
+        24
+      ],
       "forbiddenUses": [
         "do not nine-slice stretch the center ornament alone without side lines"
       ],
-      "notes": "Full decorative title divider. GameTitleDivider uses center ornament crop + CSS side lines when stretch=true; full asset when stretch=false."
-    },
-    {
-      "id": "title-divider-ornament",
-      "file": "src/assets/themes/default/dividers/title-divider-ornament.png",
-      "type": "divider",
-      "sourceFile": "src/assets/themes/default/dividers/title-divider.png",
-      "size": [140, 75],
-      "usage": ["title-rule-center"],
-      "componentTargets": ["GameTitleDivider"],
-      "scaling": "fixed",
-      "minSize": [80, 20],
-      "forbiddenUses": [],
-      "notes": "Center star ornament cropped from title-divider for stretch layout."
+      "notes": "Full decorative title divider. GameTitleDivider uses center ornament crop + CSS side lines when stretch=true; full asset when stretch=false. Cropped tight to alpha bbox."
     },
     {
       "id": "icon-button-base-default",
-      "file": "src/assets/themes/default/icons/icon-button-base.png",
+      "file": "src/assets/themes/default/icons/图标按钮底座.png",
       "type": "icon-button",
-      "sourceFile": "src/assets/raw/icon-button-base-original.png",
-      "size": [420, 422],
-      "alphaBBox": [16, 16, 404, 406],
-      "usage": ["icon-button-base"],
-      "componentTargets": ["GameIconButton"],
+      "sourceFile": "src/assets/raw/图标按钮底座-原图.png",
+      "size": [
+        1772,
+        1775
+      ],
+      "alphaBBox": [
+        24,
+        24,
+        1748,
+        1751
+      ],
+      "usage": [
+        "icon-button-base"
+      ],
+      "componentTargets": [
+        "GameIconButton"
+      ],
       "scaling": "fixed",
-      "minSize": [44, 44],
+      "minSize": [
+        44,
+        44
+      ],
       "forbiddenUses": [
         "do not nine-slice",
         "do not bake icons into the base PNG"
       ],
-      "notes": "Circular metallic button base. Icons are separate DOM/SVG overlays."
+      "notes": "Circular metallic button base. Icons are separate DOM/SVG overlays. Cropped tight to alpha bbox."
     },
     {
       "id": "button-frame-primary",
-      "file": "src/assets/themes/default/frames/button-frame-primary.png",
+      "file": "src/assets/themes/default/frames/主按钮边框.png",
       "type": "button-frame",
-      "sourceFile": "src/assets/raw/button-frame-primary-original.png",
-      "size": [933, 224],
-      "usage": ["text-button", "primary"],
-      "componentTargets": ["GameButton"],
+      "sourceFile": "src/assets/raw/主按钮边框-原图.png",
+      "size": [
+        3269,
+        753
+      ],
+      "usage": [
+        "text-button",
+        "primary"
+      ],
+      "componentTargets": [
+        "GameButton"
+      ],
       "scaling": "nine-slice",
-      "nineSlice": { "top": 48, "right": 48, "bottom": 48, "left": 48, "fill": true, "repeat": "stretch" },
-      "safeArea": { "top": 32, "right": 32, "bottom": 32, "left": 32 },
-      "minSize": [120, 48],
-      "forbiddenUses": ["do not use as feature/hero button"],
-      "notes": "Short cream primary button frame."
+      "nineSlice": {
+        "top": 210,
+        "right": 230,
+        "bottom": 210,
+        "left": 230,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 18,
+        "right": 24,
+        "bottom": 18,
+        "left": 24
+      },
+      "minSize": [
+        200,
+        68
+      ],
+      "forbiddenUses": [
+        "do not use as feature/hero button"
+      ],
+      "notes": "High-resolution cream primary plaque. Uses tokens independent from the disabled frame.",
+      "alphaBBox": [
+        24,
+        24,
+        3245,
+        729
+      ]
     },
     {
       "id": "button-frame-disabled",
-      "file": "src/assets/themes/default/frames/button-frame-disabled.png",
+      "file": "src/assets/themes/default/frames/禁用按钮边框.png",
       "type": "button-frame",
-      "sourceFile": "src/assets/raw/button-frame-disabled-original.png",
-      "size": [798, 191],
-      "usage": ["text-button", "disabled"],
-      "componentTargets": ["GameButton"],
+      "sourceFile": "src/assets/raw/禁用按钮边框-原图.png",
+      "size": [
+        2837,
+        798
+      ],
+      "usage": [
+        "text-button",
+        "disabled"
+      ],
+      "componentTargets": [
+        "GameButton"
+      ],
       "scaling": "nine-slice",
-      "nineSlice": { "top": 48, "right": 48, "bottom": 48, "left": 48, "fill": true, "repeat": "stretch" },
-      "minSize": [120, 48],
+      "nineSlice": {
+        "top": 200,
+        "right": 200,
+        "bottom": 200,
+        "left": 200,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "minSize": [
+        200,
+        68
+      ],
       "forbiddenUses": [],
-      "notes": "Short disabled/gray button frame."
+      "notes": "High-resolution disabled plaque with simple quarter-circle corners. Never share primary-button slice tokens.",
+      "alphaBBox": [
+        24,
+        24,
+        2813,
+        774
+      ],
+      "safeArea": {
+        "top": 16,
+        "right": 22,
+        "bottom": 16,
+        "left": 22
+      }
     },
     {
       "id": "resource-bar-frame",
-      "file": "src/assets/themes/default/frames/resource-bar-frame.png",
+      "file": "src/assets/themes/default/frames/资源条边框.png",
       "type": "panel-frame",
-      "sourceFile": "src/assets/raw/resource-bar-frame-original.png",
-      "size": [1013, 166],
-      "usage": ["resource-bar"],
-      "componentTargets": ["GameResourceBar"],
+      "sourceFile": "src/assets/raw/资源条边框-原图.png",
+      "size": [
+        3746,
+        393
+      ],
+      "usage": [
+        "resource-bar"
+      ],
+      "componentTargets": [
+        "GameResourceBar"
+      ],
       "scaling": "nine-slice",
-      "nineSlice": { "top": 40, "right": 40, "bottom": 40, "left": 40, "fill": true, "repeat": "stretch" },
-      "minSize": [320, 64],
-      "forbiddenUses": ["do not use as large content panel"],
-      "notes": "Dedicated narrow resource bar outer frame."
-    },
-    {
-      "id": "resource-item-frame",
-      "file": "src/assets/themes/default/frames/resource-item-frame.png",
-      "type": "panel-frame",
-      "sourceFile": "src/assets/raw/resource-item-frame-original.png",
-      "size": [702, 208],
-      "usage": ["resource-item"],
-      "componentTargets": ["GameResourceBar"],
-      "scaling": "nine-slice",
-      "nineSlice": { "top": 40, "right": 40, "bottom": 40, "left": 40, "fill": true, "repeat": "stretch" },
-      "minSize": [120, 44],
-      "forbiddenUses": [],
-      "notes": "Single resource chip frame inside the resource bar."
+      "nineSlice": {
+        "top": 105,
+        "right": 170,
+        "bottom": 105,
+        "left": 170,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "minSize": [
+        320,
+        104
+      ],
+      "forbiddenUses": [
+        "do not use as large content panel"
+      ],
+      "notes": "Dedicated narrow resource bar outer frame. Cropped tight to alpha bbox.",
+      "alphaBBox": [
+        24,
+        24,
+        3722,
+        369
+      ],
+      "safeArea": {
+        "top": 20,
+        "right": 20,
+        "bottom": 20,
+        "left": 20
+      }
     },
     {
       "id": "select-list-frame",
-      "file": "src/assets/themes/default/frames/select-list-frame.png",
+      "file": "src/assets/themes/default/frames/下拉列表基础边框.png",
       "type": "panel-frame",
-      "sourceFile": "src/assets/raw/select-list-frame-original.png",
-      "size": [350, 541],
-      "usage": ["select-dropdown-panel"],
-      "componentTargets": ["GameSelect"],
+      "sourceFile": "src/assets/raw/下拉列表边框-原图.png",
+      "size": [
+        1379,
+        1956
+      ],
+      "usage": [
+        "select-dropdown-panel"
+      ],
+      "componentTargets": [
+        "GameSelect"
+      ],
       "scaling": "nine-slice",
-      "nineSlice": { "top": 64, "right": 48, "bottom": 48, "left": 48, "fill": true, "repeat": "stretch" },
-      "minSize": [180, 120],
-      "forbiddenUses": ["do not bake option labels"],
-      "notes": "Expanded dropdown list panel with top tab notch; keep larger top slice."
+      "nineSlice": {
+        "top": 190,
+        "right": 180,
+        "bottom": 190,
+        "left": 180,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "minSize": [
+        220,
+        160
+      ],
+      "forbiddenUses": [
+        "do not bake option labels"
+      ],
+      "notes": "Derived rectangular list base. The centered top tab is a separate fixed overlay.",
+      "alphaBBox": [
+        24,
+        24,
+        1355,
+        1932
+      ],
+      "safeArea": {
+        "top": 56,
+        "right": 24,
+        "bottom": 24,
+        "left": 24
+      }
     },
     {
       "id": "select-option-hover",
-      "file": "src/assets/themes/default/frames/select-option-hover.png",
+      "file": "src/assets/themes/default/frames/下拉选项悬停.png",
       "type": "panel-frame",
-      "sourceFile": "src/assets/raw/select-option-hover-original.png",
-      "size": [980, 121],
-      "usage": ["select-option-hover"],
-      "componentTargets": ["GameSelect"],
+      "sourceFile": "src/assets/raw/下拉选项悬停-原图.png",
+      "size": [
+        3746,
+        324
+      ],
+      "usage": [
+        "select-option-hover"
+      ],
+      "componentTargets": [
+        "GameSelect"
+      ],
       "scaling": "nine-slice",
-      "nineSlice": { "top": 36, "right": 48, "bottom": 36, "left": 48, "fill": true, "repeat": "stretch" },
-      "minSize": [120, 36],
+      "nineSlice": {
+        "top": 90,
+        "right": 110,
+        "bottom": 90,
+        "left": 110,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "minSize": [
+        160,
+        72
+      ],
       "forbiddenUses": [],
-      "notes": "Hover/selected highlight strip for dropdown options."
+      "notes": "Hover/selected highlight strip for dropdown options. Cropped tight to alpha bbox.",
+      "alphaBBox": [
+        24,
+        24,
+        3722,
+        300
+      ],
+      "safeArea": {
+        "top": 14,
+        "right": 22,
+        "bottom": 14,
+        "left": 22
+      }
+    },
+    {
+      "id": "select-list-top-ornament",
+      "file": "src/assets/themes/default/frames/下拉列表顶部装饰.png",
+      "type": "divider",
+      "sourceFile": "src/assets/themes/default/frames/下拉列表边框.png",
+      "size": [
+        521,
+        145
+      ],
+      "usage": [
+        "select-dropdown-top-ornament"
+      ],
+      "componentTargets": [
+        "GameSelect"
+      ],
+      "scaling": "fixed",
+      "minSize": [
+        196,
+        54
+      ],
+      "forbiddenUses": [
+        "do not nine-slice or stretch independently"
+      ],
+      "notes": "Fixed centered top tab extracted from the original dropdown list frame."
     }
   ]
 }

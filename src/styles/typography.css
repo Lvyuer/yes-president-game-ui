@@ -33,3 +33,11 @@
   color: var(--yp-color-gold-bright);
   font-size: 0.68em;
 }
+
+/* 参考图数值：粗无衬线，与宋体标签区分 */
+.yp-data {
+  font-family: var(--yp-font-data);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}

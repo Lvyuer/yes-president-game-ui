@@ -32,6 +32,7 @@ npm run build:docs   # 构建 GitHub Pages 文档站 → playground-dist
 ## 文档
 
 - [AGENT_USAGE.md](src/docs/AGENT_USAGE.md)
+- [HUD_LAYOUT.md](src/docs/HUD_LAYOUT.md) — 主循环沉浸式 HUD 构图与 `--yp-hud-*`
 - [ASSET_PIPELINE.md](src/docs/ASSET_PIPELINE.md)
 - [COMPONENT_ACCEPTANCE.md](src/docs/COMPONENT_ACCEPTANCE.md)
 

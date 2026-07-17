@@ -37,9 +37,12 @@ const emit = defineEmits<{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 140px;
-  min-height: 52px;
+  /* keep near source plaque aspect (~4:1) so ends don't read as scroll rollers */
+  min-width: 200px;
+  min-height: 68px;
+  padding: 0;
   background: transparent;
+  border-radius: var(--yp-frame-button-sm-radius);
 }
 
 .yp-button__label {
@@ -49,8 +52,8 @@ const emit = defineEmits<{
   padding: 0 var(--yp-frame-button-sm-safe);
   min-height: inherit;
   font-family: var(--yp-font-serif);
-  letter-spacing: 0.04em;
-  font-size: 1rem;
+  letter-spacing: 0.08em;
+  font-size: 1.05rem;
   color: var(--yp-color-text-on-cream);
   text-shadow: 0 1px 0 rgba(255, 248, 232, 0.35);
 }
@@ -64,6 +67,7 @@ const emit = defineEmits<{
 }
 
 .yp-button:disabled .yp-button__label {
+  padding-inline: var(--yp-frame-button-sm-disabled-safe);
   color: #6a6a6a;
   text-shadow: none;
 }

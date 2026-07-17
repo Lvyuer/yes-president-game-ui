@@ -24,7 +24,7 @@ const apiRows = [
     <DocsPageHeader
       title="资源栏"
       english="GameResourceBar"
-      description="顶部资源区。使用 panel-frame 窄条形态，标签与数值为 DOM。"
+      description="顶部资源区：单层大框，图标与资源从左到右直排，无嵌套小框。"
     />
 
     <DocsDemoBlock title="基础用法">

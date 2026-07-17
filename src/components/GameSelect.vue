@@ -111,16 +111,18 @@ async function focusTrigger() {
       >
         {{ displayLabel }}
       </span>
+      <span class="yp-select__arrow" aria-hidden="true" />
     </button>
 
-    <ul
+    <div
       v-show="open"
       :id="listId"
-      class="yp-select__list yp-framed yp-framed--select-list"
+      class="yp-select__panel yp-framed yp-framed--select-list"
       role="listbox"
       :aria-label="props.label || '选项列表'"
     >
-      <div class="yp-framed__content yp-select__list-inner">
+      <span class="yp-select__panel-ornament" aria-hidden="true" />
+      <ul class="yp-framed__content yp-select__list">
         <li
           v-for="option in props.options"
           :key="option.value"
@@ -134,10 +136,10 @@ async function focusTrigger() {
           }"
           @click="selectOption(option.value)"
         >
-          {{ option.label }}
+          <span class="yp-select__option-label">{{ option.label }}</span>
         </li>
-      </div>
-    </ul>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -156,11 +158,13 @@ async function focusTrigger() {
 }
 
 .yp-select__trigger {
+  position: relative;
   display: block;
   width: 100%;
-  min-height: 64px;
+  min-height: 72px;
   background: transparent;
   text-align: left;
+  border-radius: var(--yp-frame-select-radius);
 }
 
 .yp-select__value {
@@ -178,39 +182,136 @@ async function focusTrigger() {
   color: rgba(216, 209, 194, 0.45);
 }
 
-.yp-select__list {
+.yp-select__arrow {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
+  top: 50%;
   right: 0;
-  z-index: 20;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  background: transparent;
-  max-height: 280px;
-  overflow: auto;
+  z-index: 2;
+  width: var(--yp-frame-select-arrow-width);
+  height: calc(100% - 18px);
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
-.yp-select__list-inner {
+.yp-select__arrow::before {
+  content: "";
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(215, 188, 126, 0.5) 20%,
+    rgba(215, 188, 126, 0.5) 80%,
+    transparent
+  );
+  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.45);
+}
+
+.yp-select__arrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid var(--yp-color-gold-bright);
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.65));
+  transform: translate(-50%, -35%);
+}
+
+/* Same width as trigger; tuck top peak under the closed frame */
+.yp-select__panel {
+  position: absolute;
+  top: calc(100% - 8px);
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 20;
+  background: transparent;
+  max-height: min(320px, 70vh);
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184, 149, 98, 0.55) transparent;
+}
+
+.yp-select__panel-ornament {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  width: 196px;
+  height: 54px;
+  transform: translateX(-50%);
+  background: var(--yp-select-list-ornament) center top / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.yp-select__panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.yp-select__panel::-webkit-scrollbar-thumb {
+  background: rgba(184, 149, 98, 0.45);
+  border-radius: 3px;
+}
+
+.yp-select__panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.yp-select__list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: calc(var(--yp-frame-select-list-safe) + 8px) var(--yp-frame-select-list-safe)
-    var(--yp-frame-select-list-safe);
+  margin: 0;
+  padding: calc(var(--yp-frame-select-list-safe-top)) var(--yp-frame-select-list-safe-x)
+    var(--yp-frame-select-list-safe-y);
+  list-style: none;
 }
 
 .yp-select__option {
-  padding: 10px 14px;
-  min-height: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 72px;
+  padding: 8px 12px;
+  margin: 0;
   font-family: var(--yp-font-sans);
   font-size: 0.95rem;
-  color: var(--yp-color-text-on-cream);
+  color: var(--yp-color-text-main);
   cursor: pointer;
   border-style: solid;
   border-color: transparent;
   border-width: var(--yp-frame-select-hover-width);
   background-clip: padding-box;
+  box-sizing: border-box;
+}
+
+/* Soft row separators — no new asset needed */
+.yp-select__option:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 90, 48, 0.28) 12%,
+    rgba(120, 90, 48, 0.28) 88%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.yp-select__option:hover:not(.is-disabled)::after,
+.yp-select__option.is-selected:not(.is-disabled)::after {
+  opacity: 0;
 }
 
 .yp-select__option:hover:not(.is-disabled),
@@ -222,6 +323,11 @@ async function focusTrigger() {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55);
 }
 
+.yp-select__option-label {
+  position: relative;
+  z-index: 1;
+}
+
 .yp-select__option.is-disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -231,7 +337,7 @@ async function focusTrigger() {
   opacity: 0.6;
 }
 
-.yp-select--open .yp-select__trigger {
+.yp-select--open .yp-select__trigger .yp-framed__content {
   filter: brightness(1.06);
 }
 </style>

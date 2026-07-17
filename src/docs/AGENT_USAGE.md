@@ -32,7 +32,13 @@ import 'yes-president-game-ui/style';
 
 ## 页面组合语法
 
-### DashboardShell — 总统主界面
+### 主循环工作屏（沉浸式真源）
+
+办公室主界面以场景为中心、HUD 贴边。构图与 Token 见 [HUD_LAYOUT.md](./HUD_LAYOUT.md)。实现参考 playground：`MainLoopShell` + `MainHud` + `MainActions`。
+
+**不要**把下面的 `DashboardShell` 当作办公室主循环构图真源——它是文档站「页面语法」演示壳（无场景沉浸）。
+
+### DashboardShell — 文档站页面语法壳（非沉浸式主循环）
 
 区域：顶部资源栏、主功能入口、核心信息面板、右侧通知区、底部操作区。
 
@@ -84,7 +90,7 @@ Slots: `header`, default, `footer`
 
 内置图标名：`action`, `document`, `chart`, `play`, `close`。也可传入自定义 URL。
 
-材质：`button-frame.png` 九宫格。最小宽度 220px。
+材质：`功能按钮边框.png` 九宫格。最小尺寸 240×160px。
 
 ### GameButton
 
@@ -133,18 +139,23 @@ Slots: `header`, default, `footer`
 
 机器可读清单：`src/assets/manifest.json`。每条资产含 nineSlice、safeArea、minSize、forbiddenUses。
 
-当前已入库：
+当前高清素材已入库（slice / width 以 `tokens.css` 为准；下列 width 为显示尺度）：
 
-- `button-frame-default` (深色) — slice `93`，用于 **GameFeatureButton**
-- `button-frame-cream` — 预留给 GameButton
-- `panel-frame-default` — slice `48`，用于 GamePanel / GameResourceBar
-- `notice-frame-default` — slice `72`，用于 **GameNotice**
-- `input-frame-default` — slice `72`，用于 **GameInput**
-- `select-frame-default` — slice `48 126 48 48`（右侧加宽锁箭头），用于 **GameSelect**
-- `progress-track-default` — slice `28 36 28 36`，用于 **GameProgressBar / GameSlider** 轨道
+- `button-frame-default` — slice `220`，width `34px`，用于 **GameFeatureButton**
+- `button-frame-primary` — slice `210 230`，width `22px 28px`，用于 **GameButton**
+- `button-frame-disabled` — slice `200`，width `20px 24px`，独立于主按钮
+- `panel-frame-default` — slice `180`，width `32px`，用于 **GamePanel**
+- `resource-bar-frame` — slice `105 170`，width `22px 30px`，用于 **GameResourceBar**
+- `resource-item-frame` — slice `180`，width `20px`，用于主循环任期框等
+- `notice-frame-default` — slice `190 170`，width `28px 24px`，用于 **GameNotice**
+- `input-frame-default` — slice `180 190`，width `26px 28px`，用于 **GameInput**
+- `select-frame-default` — 使用无箭头基础框；箭头和列表顶部凸起为独立覆盖层
+- `progress-track-default` — slice `110 160`，width `12px 26px`，用于 **GameProgressBar / GameSlider**
 - `progress-thumb-default` — 固定尺寸滑块按钮
 - `title-divider-default` / ornament — 标题分割装饰线，用于 **GameTitleDivider / GamePanel**
 - `icon-button-base-default` — 圆形按钮底座，用于 **GameIconButton**
+
+主循环资源条：标签在上、数值在下；**不要**加趋势箭头。任期进度用细 pill，不用 `GameProgressBar`。详见 [HUD_LAYOUT.md](./HUD_LAYOUT.md) §5。
 
 ### GameTitleDivider
 

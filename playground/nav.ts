@@ -11,8 +11,7 @@ export const docsNav: DocsNavItem[] = [
   { id: 'button', label: '按钮', en: 'GameButton', group: 'components' },
   { id: 'icon-button', label: '图标按钮', en: 'GameIconButton', group: 'components' },
   { id: 'panel', label: '面板', en: 'GamePanel', group: 'components' },
-  { id: 'progress', label: '进度条', en: 'GameProgressBar', group: 'components' },
-  { id: 'slider', label: '滑块', en: 'GameSlider', group: 'components' },
+  { id: 'progress', label: '进度条 / 滑块', en: 'GameProgressBar · GameSlider', group: 'components' },
   { id: 'notice', label: '通知', en: 'GameNotice', group: 'components' },
   { id: 'input', label: '输入框', en: 'GameInput', group: 'components' },
   { id: 'select', label: '下拉选择', en: 'GameSelect', group: 'components' },
@@ -20,6 +19,7 @@ export const docsNav: DocsNavItem[] = [
   { id: 'action-grid', label: '功能入口区', en: 'ActionGrid', group: 'layouts' },
   { id: 'notice-stack', label: '通知栈', en: 'NoticeStack', group: 'layouts' },
   { id: 'dashboard', label: '主界面壳', en: 'DashboardShell', group: 'layouts' },
+  { id: 'main-loop', label: '主循环', en: 'Main Loop', group: 'layouts' },
 ];
 
 export const groupLabels: Record<DocsNavItem['group'], string> = {

@@ -37,10 +37,12 @@ const iconSrc = computed(() => resolveGameIcon(props.icon));
 <style scoped>
 .yp-feature-button {
   display: inline-flex;
-  min-width: 220px;
-  min-height: 140px;
-  background: var(--yp-color-surface-deep);
+  min-width: 240px;
+  min-height: 176px;
+  /* fill comes from rounded button-frame PNG */
+  background: transparent;
   color: var(--yp-color-text-main);
+  border-radius: var(--yp-frame-button-radius);
 }
 
 .yp-feature-button__inner {
@@ -55,16 +57,22 @@ const iconSrc = computed(() => resolveGameIcon(props.icon));
 }
 
 .yp-feature-button__icon {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   width: 48px;
   height: 48px;
 }
 
 .yp-feature-button__icon img {
-  width: 100%;
-  height: 100%;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
+  object-position: center;
 }
 
 .yp-feature-button__label {

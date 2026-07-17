@@ -1,7 +1,9 @@
 :root {
-  --yp-font-serif: "SimSun", "NSimSun", "Songti SC", "Noto Serif SC", serif;
-  --yp-font-sans: "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
-  --yp-font-latin: "Bahnschrift", "DIN Condensed", "Agency FB", "Consolas", monospace;
+  /* 参考图：中文精致宋体；数值/英文用粗无衬线 */
+  --yp-font-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --yp-font-sans: "Inter", "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+  --yp-font-latin: "Inter", "Bahnschrift", "DIN Condensed", Arial, sans-serif;
+  --yp-font-data: "Inter", "Bahnschrift", Arial, sans-serif;
 
   --yp-color-text-main: #fff8e8;
   --yp-color-text-muted: #d8d1c2;
@@ -22,50 +24,72 @@
 
   --yp-shadow-panel: 0 16px 26px rgba(18, 20, 20, 0.22);
 
-  --yp-frame-panel-slice: 48 48 48 48;
-  --yp-frame-panel-width: 36px;
-  --yp-frame-panel-safe: 40px;
+  /* Source slices protect the complete corner art; CSS widths set visual scale. */
+  /* 整体较峰值约收 15–20%，边框与内容同步回落 */
+  --yp-frame-panel-slice: 180 180 180 180;
+  --yp-frame-panel-width: 32px;
+  --yp-frame-panel-safe: 36px;
 
-  --yp-frame-button-slice: 93 93 93 93;
-  --yp-frame-button-width: 46px;
-  --yp-frame-button-safe: 56px;
+  --yp-frame-button-slice: 220 220 220 220;
+  --yp-frame-button-width: 34px;
+  --yp-frame-button-safe: 38px;
 
-  --yp-frame-notice-slice: 72 72 72 72;
-  --yp-frame-notice-width: 36px;
-  --yp-frame-notice-safe: 40px;
+  --yp-frame-notice-slice: 190 170 190 170;
+  --yp-frame-notice-width: 28px 24px;
+  --yp-frame-notice-safe: 28px;
 
-  --yp-frame-input-slice: 72 72 72 72;
-  --yp-frame-input-width: 36px;
-  --yp-frame-input-safe: 40px;
+  --yp-frame-input-slice: 180 190 180 190;
+  --yp-frame-input-width: 26px 28px;
+  --yp-frame-input-safe: 28px;
 
-  /* select: large right slice locks baked chevron panel */
-  --yp-frame-select-slice: 48 126 48 48;
-  --yp-frame-select-width: 28px 64px 28px 28px;
+  --yp-frame-select-slice: 130 140 130 140;
+  --yp-frame-select-width: 20px 22px;
   --yp-frame-select-safe-x: 28px;
-  --yp-frame-select-safe-right: 72px;
+  --yp-frame-select-safe-right: 76px;
+  --yp-frame-select-arrow-width: 68px;
 
-  --yp-frame-progress-slice: 28 36 28 36;
-  --yp-frame-progress-width: 10px 18px;
-  --yp-progress-thumb-size: 28px 34px;
+  --yp-frame-progress-slice: 110 160 110 160;
+  --yp-frame-progress-width: 12px 26px;
+  --yp-progress-fill-offset: -4px;
+  --yp-progress-track-shift: -2px;
+  --yp-progress-thumb-nudge: 6px;
+  --yp-progress-thumb-end: -4px;
+  --yp-progress-thumb-size: 30px 34px;
 
-  --yp-frame-button-sm-slice: 48 48 48 48;
-  --yp-frame-button-sm-width: 28px;
-  --yp-frame-button-sm-safe: 32px;
+  --yp-frame-button-sm-slice: 210 230 210 230;
+  --yp-frame-button-sm-width: 22px 28px;
+  --yp-frame-button-sm-safe: 28px;
+  --yp-frame-button-sm-disabled-slice: 200 200 200 200;
+  --yp-frame-button-sm-disabled-width: 20px 24px;
+  --yp-frame-button-sm-disabled-safe: 26px;
 
-  --yp-frame-resource-bar-slice: 40 40 40 40;
-  --yp-frame-resource-bar-width: 24px;
-  --yp-frame-resource-bar-safe: 28px;
+  --yp-frame-resource-bar-slice: 105 170 105 170;
+  --yp-frame-resource-bar-width: 22px 30px;
+  --yp-frame-resource-bar-safe: 26px;
 
-  --yp-frame-resource-item-slice: 40 40 40 40;
-  --yp-frame-resource-item-width: 22px;
+  --yp-frame-resource-item-slice: 180 180 180 180;
+  --yp-frame-resource-item-width: 20px;
   --yp-frame-resource-item-safe: 24px;
 
-  --yp-frame-select-list-slice: 64 48 48 48;
-  --yp-frame-select-list-width: 36px 28px 28px 28px;
-  --yp-frame-select-list-safe: 28px;
+  --yp-frame-select-list-slice: 190 180 190 180;
+  --yp-frame-select-list-width: 30px 26px;
+  --yp-frame-select-list-safe-top: 58px;
+  --yp-frame-select-list-safe-x: 28px;
+  --yp-frame-select-list-safe-y: 28px;
 
-  --yp-frame-select-hover-slice: 36 48 36 48;
-  --yp-frame-select-hover-width: 12px 20px;
+  --yp-frame-select-hover-slice: 90 110 90 110;
+  --yp-frame-select-hover-width: 16px 24px;
+
+  --yp-frame-panel-radius: 20px;
+  --yp-frame-button-radius: 24px;
+  --yp-frame-button-sm-radius: 14px;
+  --yp-frame-notice-radius: 16px;
+  --yp-frame-input-radius: 16px;
+  --yp-frame-select-radius: 14px;
+  --yp-frame-select-list-radius: 16px;
+  --yp-frame-progress-radius: 999px;
+  --yp-frame-resource-bar-radius: 14px;
+  --yp-frame-resource-item-radius: 12px;
 
   --yp-color-text-on-cream: #2a2218;
   --yp-color-text-on-cream-muted: #6a5a45;
@@ -75,6 +99,29 @@
 
   --yp-radius-sm: 4px;
   --yp-radius-md: 8px;
+
+  /* Main-loop HUD layout (see src/docs/HUD_LAYOUT.md) */
+  --yp-hud-aspect: 16 / 9;
+  --yp-hud-stage-pad: 16px;
+  --yp-hud-safe-x: 18px;
+  --yp-hud-safe-top: 14px;
+  --yp-hud-safe-bottom: 18px;
+
+  --yp-hud-top-gap: 12px;
+  --yp-hud-top-time-min-w: 340px;
+  --yp-hud-top-time-max-w: 460px;
+  --yp-hud-top-time-min-h: 168px;
+  --yp-hud-top-fade: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent);
+
+  --yp-hud-dock-max-w: 920px;
+  --yp-hud-dock-w: 84%;
+  --yp-hud-dock-gap: 12px;
+  --yp-hud-dock-btn-min-h: 176px;
+  --yp-hud-dock-pad-top: 6px;
+  --yp-hud-dock-fade: linear-gradient(0deg, rgba(0, 0, 0, 0.55), transparent);
+
+  /* Documented breakpoint; media queries must use literal 900px */
+  --yp-hud-break-narrow: 900px;
 }
 
 .yp-theme-default {
