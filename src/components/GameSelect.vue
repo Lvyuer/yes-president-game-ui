@@ -151,6 +151,7 @@ async function focusTrigger() {
   gap: 8px;
   width: 100%;
   max-width: 520px;
+  overflow: visible;
 }
 
 .yp-select__label {
@@ -224,44 +225,34 @@ async function focusTrigger() {
   transform: translate(-50%, -35%);
 }
 
-/* Same width as trigger; tuck top peak under the closed frame */
+/* Same width as trigger. Frame stays on the panel — scroll lives on the list
+   so border-image is never clipped. Small gap below trigger keeps the top tab readable. */
 .yp-select__panel {
   position: absolute;
-  top: calc(100% - 8px);
+  top: calc(100% + 4px);
   left: 0;
   width: 100%;
   box-sizing: border-box;
   z-index: 20;
+  overflow: visible;
   background: transparent;
-  max-height: min(320px, 70vh);
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(184, 149, 98, 0.55) transparent;
 }
 
+/*
+  Fixed overlay for the centered top tab from 下拉列表边框.png.
+  Shoulder line aligns to the base frame gold stroke (~4px below panel top),
+  so the tab peaks above the rectangle without a floating/double-edge seam.
+*/
 .yp-select__panel-ornament {
   position: absolute;
-  top: 0;
+  top: var(--yp-select-list-ornament-top);
   left: 50%;
-  z-index: 2;
-  width: 196px;
-  height: 54px;
+  z-index: 3;
+  width: var(--yp-select-list-ornament-width);
+  height: var(--yp-select-list-ornament-height);
   transform: translateX(-50%);
   background: var(--yp-select-list-ornament) center top / 100% 100% no-repeat;
   pointer-events: none;
-}
-
-.yp-select__panel::-webkit-scrollbar {
-  width: 6px;
-}
-
-.yp-select__panel::-webkit-scrollbar-thumb {
-  background: rgba(184, 149, 98, 0.45);
-  border-radius: 3px;
-}
-
-.yp-select__panel::-webkit-scrollbar-track {
-  background: transparent;
 }
 
 .yp-select__list {
@@ -271,6 +262,30 @@ async function focusTrigger() {
   padding: calc(var(--yp-frame-select-list-safe-top)) var(--yp-frame-select-list-safe-x)
     var(--yp-frame-select-list-safe-y);
   list-style: none;
+  /* Fit ~5 rows before scrolling; short lists keep a full, unclipped frame */
+  max-height: min(
+    calc(
+      var(--yp-frame-select-list-safe-top) + (72px * 5) + var(--yp-frame-select-list-safe-y)
+    ),
+    70vh
+  );
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184, 149, 98, 0.55) transparent;
+}
+
+.yp-select__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.yp-select__list::-webkit-scrollbar-thumb {
+  background: rgba(184, 149, 98, 0.45);
+  border-radius: 3px;
+}
+
+.yp-select__list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .yp-select__option {

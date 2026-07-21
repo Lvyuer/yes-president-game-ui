@@ -2,6 +2,10 @@
 import { ActionGrid } from '@/index';
 import { MAIN_ACTIONS } from './data';
 
+const props = defineProps<{
+  highlightAction?: 'phone' | 'publish' | 'inbox' | 'nation';
+}>();
+
 const emit = defineEmits<{
   action: [id: 'phone' | 'publish' | 'inbox' | 'nation'];
 }>();
@@ -13,7 +17,13 @@ function onAction(index: number) {
 </script>
 
 <template>
-  <div class="ml-actions-wrap">
+  <div
+    class="ml-actions-wrap"
+    :class="{
+      'is-phone-highlight': props.highlightAction === 'phone',
+      'is-inbox-highlight': props.highlightAction === 'inbox',
+    }"
+  >
     <ActionGrid class="ml-actions" :items="MAIN_ACTIONS" @action="onAction" />
   </div>
 </template>
@@ -29,6 +39,12 @@ function onAction(index: number) {
   width: min(var(--yp-hud-dock-max-w), var(--yp-hud-dock-w));
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--yp-hud-dock-gap);
+  overflow: visible;
+}
+
+.ml-actions :deep(.yp-action-grid),
+.ml-actions :deep(.yp-action-grid > *) {
+  overflow: visible;
 }
 
 .ml-actions :deep(.yp-feature-button) {
@@ -85,6 +101,84 @@ function onAction(index: number) {
   text-transform: uppercase;
   color: var(--yp-color-gold-bright);
   opacity: 0.9;
+}
+
+/* phone = 1st, inbox = 3rd — bounce whole button + rounded halo matching frame */
+.ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1)),
+.ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3)) {
+  position: relative;
+  z-index: 3;
+}
+
+.ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button),
+.ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button) {
+  animation: ml-dock-bounce 1.05s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+  will-change: transform;
+}
+
+.ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button::before),
+.ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button::before) {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  z-index: 4;
+  border-radius: calc(var(--yp-frame-button-radius) + 5px);
+  border: 2px solid rgba(232, 205, 140, 0.95);
+  background: rgba(184, 149, 98, 0.14);
+  box-shadow:
+    0 0 0 3px rgba(215, 188, 126, 0.22),
+    0 0 22px rgba(215, 188, 126, 0.55),
+    inset 0 0 18px rgba(215, 188, 126, 0.18);
+  pointer-events: none;
+  animation: ml-dock-halo 1.05s ease-in-out infinite;
+}
+
+@keyframes ml-dock-bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  18% {
+    transform: translateY(-16px) scale(1.06);
+  }
+  32% {
+    transform: translateY(-3px) scale(1.02);
+  }
+  48% {
+    transform: translateY(-12px) scale(1.05);
+  }
+  62% {
+    transform: translateY(0) scale(1);
+  }
+  /* hold so the jump reads clearly between cycles */
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ml-dock-halo {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button),
+  .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button) {
+    animation: none;
+  }
+
+  .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button::before),
+  .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button::before) {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 @media (max-width: 900px) {

@@ -1,17 +1,38 @@
 export type MainLoopScreen = 'main' | 'publish' | 'inbox' | 'nation';
 
 export const DIRECTIONS = [
-  { id: 'livelihood', label: '民生与秩序', desc: '公共服务、治安、罢工与社会运转' },
-  { id: 'economy', label: '经济与产业', desc: '就业、投资、贸易保护与基础设施' },
-  { id: 'culture', label: '文化与认同', desc: '教育传媒、国家叙事与社会共识' },
-  { id: 'defense', label: '国防与安全', desc: '军费、战备、边境与军工体系' },
-  { id: 'diplomacy', label: '外交与贸易', desc: '盟友、条约、关税与国际组织' },
+  {
+    id: 'democracy',
+    label: '民主与选举制度',
+    desc: '立法机构组成、选区划分、选举程序与政党规则',
+  },
+  {
+    id: 'economy',
+    label: '经济与财税管理',
+    desc: '预算、税收、财政结构与产业调控',
+  },
+  {
+    id: 'culture',
+    label: '文化与社会福利',
+    desc: '教育、医疗、宗教自由与社会保障',
+  },
+  {
+    id: 'defense',
+    label: '国防与安全',
+    desc: '武装力量、国防政策、应急管理与边境安全',
+  },
+  {
+    id: 'diplomacy',
+    label: '外交与贸易',
+    desc: '主权、对外关系、关税与国际组织',
+  },
 ] as const;
 
 export type InboxItem = {
   id: string;
   title: string;
   source: string;
+  deadline: string;
   urgency: 'urgent' | 'crisis' | 'normal';
   urgencyLabel: string;
   direction: string;
@@ -24,6 +45,7 @@ export const INBOX_ITEMS: InboxItem[] = [
     id: 'port-comp',
     title: '港口临时补偿申请',
     source: '工会领袖',
+    deadline: '3月12日',
     urgency: 'urgent',
     urgencyLabel: '紧急',
     direction: '民生与秩序',
@@ -33,21 +55,12 @@ export const INBOX_ITEMS: InboxItem[] = [
   {
     id: 'congress-invest',
     title: '国会要求调查调水门',
-    source: '国会委员会',
+    source: '自然资源委员会',
+    deadline: '3月9日',
     urgency: 'crisis',
-    urgencyLabel: '红色危机',
+    urgencyLabel: '红色优先级',
     direction: '民生与秩序',
-    summary: '要求成立独立委员会调查副总统游艇调水门事件，并公开水位调度记录。',
-    status: 'pending',
-  },
-  {
-    id: 'military-budget',
-    title: '军方请求追加边境预算',
-    source: '国防部',
-    urgency: 'normal',
-    urgencyLabel: '普通',
-    direction: '国防与安全',
-    summary: '边境雷达老化，请求追加本财年军费 120 亿用于战备升级。',
+    summary: '要求成立独立委员会调查封锁通往调水门事件，并公开水位调查记录。',
     status: 'pending',
   },
 ];
@@ -58,6 +71,7 @@ export type NationMetric = {
   value: string;
   delta: string;
   group: string;
+  groupEn: string;
   description: string;
   defaultView: 'domestic' | 'network' | 'trend';
   summary: [string, string, string];
@@ -65,52 +79,58 @@ export type NationMetric = {
   progress: number;
 };
 
+export const NATION_GROUP_ORDER = ['治理绩效', '国家能力'] as const;
+
 export const NATION_METRICS: NationMetric[] = [
   {
     key: 'support',
     label: '支持率',
     value: '44%',
-    delta: '-2.1 / 周',
-    group: '治理底盘',
-    description: '选民是否仍愿意让你继续执政。',
+    delta: '▼ 2.1 / 期',
+    group: '治理绩效',
+    groupEn: 'GOVERNANCE',
+    description: '通过建立和保持主导的地位来推动政策。',
     defaultView: 'domestic',
-    summary: ['摇摆州持续流失', '港口州 -4', '国内稳定'],
+    summary: ['港口州持续承压', '范围：+4', '推进中'],
     trend: [46, 48, 43, 47, 45, 46, 44],
     progress: 44,
   },
   {
     key: 'stability',
-    label: '国内稳定',
+    label: '通胀稳定',
     value: '42',
-    delta: '-3 / 周',
-    group: '治理底盘',
-    description: '罢工、港口、治安与社会秩序的综合状态。',
+    delta: '▼ 3 / 期',
+    group: '治理绩效',
+    groupEn: 'GOVERNANCE',
+    description: '物价与社会成本压力是否处于可控区间。',
     defaultView: 'domestic',
-    summary: ['港口危机仍在扩大', '2 个红色点位', '支持率'],
+    summary: ['食品与能源领涨', '范围：+2', '观察中'],
     trend: [55, 53, 50, 51, 47, 45, 42],
     progress: 42,
   },
   {
     key: 'cpi',
-    label: 'CPI（物价）',
+    label: 'CPI（年化）',
     value: '3.9%',
-    delta: '+0.2 / 周',
-    group: '治理底盘',
+    delta: '▲ 2 / 期',
+    group: '治理绩效',
+    groupEn: 'GOVERNANCE',
     description: '居民对通胀与生活成本变化的直接体感。',
     defaultView: 'trend',
-    summary: ['食品与能源领涨', '连续 4 周上升', '经济景气'],
+    summary: ['连续 4 期上升', '范围：+1', '预警'],
     trend: [31, 34, 38, 43, 49, 55, 61],
     progress: 39,
   },
   {
     key: 'economy',
-    label: '经济景气',
+    label: '经济水平',
     value: '58',
-    delta: '+2 / 周',
-    group: '路线实力',
+    delta: '▲ 2 / 期',
+    group: '国家能力',
+    groupEn: 'NATIONAL POWER',
     description: '增长、就业、产业投资与市场活力。',
     defaultView: 'domestic',
-    summary: ['沿海工业带复苏', '基建投资 +8%', 'CPI'],
+    summary: ['沿海工业带复苏', '范围：+3', '稳定'],
     trend: [42, 46, 48, 51, 53, 55, 58],
     progress: 58,
   },
@@ -118,35 +138,38 @@ export const NATION_METRICS: NationMetric[] = [
     key: 'culture',
     label: '文化影响',
     value: '52',
-    delta: '+1 / 周',
-    group: '路线实力',
+    delta: '▲ 1 / 期',
+    group: '国家能力',
+    groupEn: 'NATIONAL POWER',
     description: '分众国文化叙事在国内外的传播与认同。',
     defaultView: 'network',
-    summary: ['西方盟友传播增强', '2 个新文化市场', '个人威望'],
+    summary: ['西方盟友传播增强', '范围：+1', '推进中'],
     trend: [41, 43, 45, 46, 49, 51, 52],
     progress: 52,
   },
   {
     key: 'military',
-    label: '军事态势',
+    label: '军事势态',
     value: '61',
-    delta: '持平',
-    group: '路线实力',
+    delta: '▲ 1 / 期',
+    group: '国家能力',
+    groupEn: 'NATIONAL POWER',
     description: '战备、基地、边境与安全合作的整体态势。',
     defaultView: 'network',
-    summary: ['东方边境压力上升', '北方合作稳定', '安全指数'],
+    summary: ['东方边境压力上升', '范围：持平', '戒备'],
     trend: [58, 59, 60, 62, 61, 61, 61],
     progress: 61,
   },
   {
     key: 'diplomacy',
-    label: '外交态势',
+    label: '外交影响',
     value: '48',
-    delta: '-1 / 周',
-    group: '路线实力',
+    delta: '▲ 1 / 期',
+    group: '国家能力',
+    groupEn: 'NATIONAL POWER',
     description: '盟友、条约、贸易伙伴与国际组织关系。',
     defaultView: 'network',
-    summary: ['东方关系继续恶化', '海湾贸易谈判停滞', '经济景气'],
+    summary: ['东方关系继续恶化', '范围：-1', '僵持'],
     trend: [55, 54, 53, 52, 50, 49, 48],
     progress: 48,
   },

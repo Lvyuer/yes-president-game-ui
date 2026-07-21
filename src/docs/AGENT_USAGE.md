@@ -154,6 +154,8 @@ Slots: `header`, default, `footer`
 - `progress-thumb-default` — 固定尺寸滑块按钮
 - `title-divider-default` / ornament — 标题分割装饰线，用于 **GameTitleDivider / GamePanel**
 - `icon-button-base-default` — 圆形按钮底座，用于 **GameIconButton**
+- `chat-bubble-frame-in` — slice `72`，width `14px`，入站气泡，用于 **FelegramChat**
+- `chat-bubble-frame-out` — 同 slice/width，出站青绿染色变体，用于 **FelegramChat**
 
 主循环资源条：标签在上、数值在下；**不要**加趋势箭头。任期进度用细 pill，不用 `GameProgressBar`。详见 [HUD_LAYOUT.md](./HUD_LAYOUT.md) §5。
 

@@ -75,10 +75,21 @@
   --yp-frame-select-list-width: 30px 26px;
   --yp-frame-select-list-safe-top: 58px;
   --yp-frame-select-list-safe-x: 28px;
-  --yp-frame-select-list-safe-y: 28px;
+  /* Slightly above bottom border width (30px) so last option clears the gold edge */
+  --yp-frame-select-list-safe-y: 32px;
+  /* Top tab overlay — source 下拉列表顶部装饰.png 521×145; shoulder ≈ y 61/145.
+     Base gold outer ≈ 4px below panel top → top = 4px - 61/145 * 56px ≈ -19.5px */
+  --yp-select-list-ornament-width: 203px;
+  --yp-select-list-ornament-height: 56px;
+  --yp-select-list-ornament-top: -19.5px;
 
   --yp-frame-select-hover-slice: 90 110 90 110;
   --yp-frame-select-hover-width: 16px 24px;
+
+  /* 聊天框.png 1532×755；圆角约 40px + 24 安全边 → slice 72；手机气泡显示宽度独立 */
+  --yp-frame-chat-bubble-slice: 72 72 72 72;
+  --yp-frame-chat-bubble-width: 14px;
+  --yp-frame-chat-bubble-safe: 12px;
 
   --yp-frame-panel-radius: 20px;
   --yp-frame-button-radius: 24px;
@@ -90,6 +101,7 @@
   --yp-frame-progress-radius: 999px;
   --yp-frame-resource-bar-radius: 14px;
   --yp-frame-resource-item-radius: 12px;
+  --yp-frame-chat-bubble-radius: 16px;
 
   --yp-color-text-on-cream: #2a2218;
   --yp-color-text-on-cream-muted: #6a5a45;

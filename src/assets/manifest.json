@@ -635,6 +635,67 @@
         "do not nine-slice or stretch independently"
       ],
       "notes": "Fixed centered top tab extracted from the original dropdown list frame."
+    },
+    {
+      "id": "chat-bubble-frame-in",
+      "file": "src/assets/themes/default/frames/聊天框.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/聊天框-原图.png",
+      "size": [1532, 755],
+      "alphaBBox": [24, 24, 1508, 731],
+      "usage": ["chat-bubble-incoming", "message-bubble"],
+      "componentTargets": ["FelegramChat"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 72,
+        "right": 72,
+        "bottom": 72,
+        "left": 72,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 12,
+        "right": 12,
+        "bottom": 12,
+        "left": 12
+      },
+      "minSize": [120, 44],
+      "forbiddenUses": [
+        "do not bake message text into the PNG",
+        "do not use as full-screen phone chrome"
+      ],
+      "notes": "Matte charcoal chat bubble frame from root 聊天框.png; soft rounded corners, no Art Deco gold."
+    },
+    {
+      "id": "chat-bubble-frame-out",
+      "file": "src/assets/themes/default/frames/聊天框-出站.png",
+      "type": "panel-frame",
+      "sourceFile": "src/assets/raw/聊天框-原图.png",
+      "size": [1532, 755],
+      "alphaBBox": [24, 24, 1508, 731],
+      "usage": ["chat-bubble-outgoing"],
+      "componentTargets": ["FelegramChat"],
+      "scaling": "nine-slice",
+      "nineSlice": {
+        "top": 72,
+        "right": 72,
+        "bottom": 72,
+        "left": 72,
+        "fill": true,
+        "repeat": "stretch"
+      },
+      "safeArea": {
+        "top": 12,
+        "right": 12,
+        "bottom": 12,
+        "left": 12
+      },
+      "minSize": [120, 44],
+      "forbiddenUses": [
+        "do not bake message text into the PNG"
+      ],
+      "notes": "Teal-tinted variant of 聊天框.png for outgoing bubbles."
     }
   ]
 }

@@ -113,6 +113,26 @@
   border-image-slice: var(--yp-frame-select-list-slice) fill;
 }
 
+.yp-framed--chat-bubble {
+  border-radius: var(--yp-frame-chat-bubble-radius);
+}
+
+.yp-framed--chat-bubble::after {
+  border-width: var(--yp-frame-chat-bubble-width);
+  border-image-source: var(--yp-frame-chat-bubble);
+  border-image-slice: var(--yp-frame-chat-bubble-slice) fill;
+}
+
+.yp-framed--chat-bubble-out {
+  border-radius: var(--yp-frame-chat-bubble-radius);
+}
+
+.yp-framed--chat-bubble-out::after {
+  border-width: var(--yp-frame-chat-bubble-width);
+  border-image-source: var(--yp-frame-chat-bubble-out);
+  border-image-slice: var(--yp-frame-chat-bubble-slice) fill;
+}
+
 .yp-framed__content {
   position: relative;
   z-index: 1;

@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { GameButton, GamePanel, GameProgressBar, GameTitleDivider } from '@/index';
+import { GameButton } from '@/index';
 import { NATION_METRICS, type NationMetric } from './data';
+import nationBase from './assets/nation-ui-base.png';
+
+const props = defineProps<{
+  metrics?: NationMetric[];
+  feedbackPending?: boolean;
+}>();
 
 const emit = defineEmits<{
   back: [];
@@ -10,8 +16,10 @@ const emit = defineEmits<{
 const metricKey = ref('support');
 const view = ref<'domestic' | 'network' | 'trend'>('domestic');
 
+const flatMetrics = computed(() => props.metrics ?? NATION_METRICS);
+
 const metric = computed(
-  () => NATION_METRICS.find((m) => m.key === metricKey.value) ?? NATION_METRICS[0],
+  () => flatMetrics.value.find((m) => m.key === metricKey.value) ?? flatMetrics.value[0],
 );
 
 watch(metricKey, () => {
@@ -36,126 +44,213 @@ const trendPoints = computed(() => {
     })
     .join(' ');
 });
+
+const summaryLabels = ['政策动向', '支出影响', '政策状态'] as const;
+
+const viewTabs = [
+  { id: 'domestic' as const, label: '国内地图' },
+  { id: 'network' as const, label: '地区影响' },
+  { id: 'trend' as const, label: '趋势' },
+];
+
+/** Tops measured from nation-ui-base.png metric slots (v2) */
+const METRIC_TOPS = [
+  '15.74%',
+  '27.22%',
+  '38.29%',
+  '49.35%',
+  '60.42%',
+  '71.44%',
+  '82.55%',
+] as const;
 </script>
 
 <template>
-  <div class="ml-screen">
-    <header class="ml-screen__head">
-      <GameButton variant="secondary" @click="emit('back')">返回</GameButton>
+  <div class="ml-nation" :class="{ 'is-pending': props.feedbackPending }" data-screen-root>
+    <img
+      class="ml-nation__base"
+      :src="nationBase"
+      alt=""
+      draggable="false"
+    />
+
+    <header class="ml-nation__head">
+      <GameButton variant="secondary" @click="emit('back')">返回首页</GameButton>
       <div>
-        <p class="ml-screen__en">NATION DATA</p>
-        <h2 class="ml-screen__title">国家数据</h2>
+        <p class="ml-nation__en">NATIONAL INTELLIGENCE</p>
+        <h2 class="ml-nation__title">国家数据</h2>
       </div>
     </header>
 
-    <div class="ml-nation">
-      <aside class="ml-nation__side">
-        <button
-          v-for="item in NATION_METRICS"
-          :key="item.key"
-          type="button"
-          class="ml-metric"
-          :class="{ 'is-active': item.key === metricKey }"
-          @click="selectMetric(item)"
-        >
-          <span class="ml-metric__group">{{ item.group }}</span>
-          <strong>{{ item.label }}</strong>
-          <span class="ml-metric__row">
-            <span>{{ item.value }}</span>
-            <span>{{ item.delta }}</span>
-          </span>
-        </button>
-      </aside>
+    <p class="ml-nation__group ml-nation__group--gov">治理绩效</p>
+    <p class="ml-nation__group ml-nation__group--power">国家能力</p>
 
-      <GamePanel :title="metric.label" :subtitle="metric.description" size="medium">
-        <div class="ml-views">
-          <button
-            type="button"
-            class="ml-view-tab"
-            :class="{ 'is-active': view === 'domestic' }"
-            @click="view = 'domestic'"
-          >
-            国内态势
-          </button>
-          <button
-            type="button"
-            class="ml-view-tab"
-            :class="{ 'is-active': view === 'network' }"
-            @click="view = 'network'"
-          >
-            国际网络
-          </button>
-          <button
-            type="button"
-            class="ml-view-tab"
-            :class="{ 'is-active': view === 'trend' }"
-            @click="view = 'trend'"
-          >
-            趋势
-          </button>
-        </div>
+    <button
+      v-for="(item, index) in flatMetrics"
+      :key="item.key"
+      type="button"
+      class="ml-metric"
+      :class="{ 'is-active': item.key === metricKey }"
+      :style="{ top: METRIC_TOPS[index] }"
+      @click="selectMetric(item)"
+    >
+      <span class="ml-metric__label">{{ item.label }}</span>
+      <span class="ml-metric__values">
+        <span class="ml-metric__value">{{ item.value }}</span>
+        <span class="ml-metric__delta">{{ item.delta }}</span>
+      </span>
+    </button>
 
-        <GameProgressBar :label="metric.label" :value="metric.progress" tone="warning" />
-
-        <div v-if="view === 'domestic'" class="ml-canvas ml-canvas--map">
-          <p>稳定区域 · 摇摆区域 · 危机点位（示意）</p>
-          <div class="ml-map-dots">
-            <span class="dot strong" />
-            <span class="dot warning" />
-            <span class="dot crisis" />
-          </div>
-        </div>
-
-        <div v-else-if="view === 'network'" class="ml-canvas ml-canvas--net">
-          <div class="node center">分众国</div>
-          <div class="node n">北方联盟</div>
-          <div class="node e">东方集团</div>
-          <div class="node s">海湾贸易国</div>
-          <div class="node w">西方盟友</div>
-        </div>
-
-        <div v-else class="ml-canvas">
-          <svg class="ml-trend" viewBox="0 0 640 208" role="img" aria-label="趋势图">
-            <polyline
-              :points="trendPoints"
-              fill="none"
-              stroke="rgba(215,188,126,0.9)"
-              stroke-width="3"
-            />
-          </svg>
-        </div>
-
-        <GameTitleDivider />
-        <footer class="ml-summary">
-          <div><span>关键观察</span><strong>{{ metric.summary[0] }}</strong></div>
-          <div><span>本周变化</span><strong>{{ metric.summary[1] }}</strong></div>
-          <div><span>关联指标</span><strong>{{ metric.summary[2] }}</strong></div>
-        </footer>
-      </GamePanel>
+    <div class="ml-views" role="tablist" aria-label="视图切换">
+      <button
+        v-for="tab in viewTabs"
+        :key="tab.id"
+        type="button"
+        role="tab"
+        class="ml-view-tab"
+        :class="{ 'is-active': view === tab.id }"
+        :aria-selected="view === tab.id"
+        @click="view = tab.id"
+      >
+        {{ tab.label }}
+      </button>
     </div>
+
+    <section class="ml-nation__detail" aria-label="指标详情">
+      <header class="ml-nation__detail-head">
+        <div class="ml-nation__detail-intro">
+          <p class="ml-nation__crumb">
+            {{ metric.group }} / {{ metric.groupEn }}
+          </p>
+          <h3 class="ml-nation__detail-title">{{ metric.label }}</h3>
+          <p class="ml-nation__detail-desc">{{ metric.description }}</p>
+        </div>
+        <div class="ml-nation__detail-value">
+          <span class="ml-nation__value">{{ metric.value }}</span>
+          <span class="ml-nation__delta">{{ metric.delta }}</span>
+        </div>
+      </header>
+
+      <div v-if="view === 'domestic'" class="ml-canvas ml-canvas--map">
+        <p class="ml-canvas__placeholder">地图可视化占位</p>
+        <div class="ml-map-legend">
+          <span><i class="dot strong" />稳定区域</span>
+          <span><i class="dot warning" />摇摆区域</span>
+          <span><i class="dot crisis" />重点点位</span>
+        </div>
+      </div>
+
+      <div v-else-if="view === 'network'" class="ml-canvas ml-canvas--net">
+        <div class="node center">分众国</div>
+        <div class="node n">北方联盟</div>
+        <div class="node e">东方集团</div>
+        <div class="node s">海湾贸易国</div>
+        <div class="node w">西方盟友</div>
+      </div>
+
+      <div v-else class="ml-canvas">
+        <svg class="ml-trend" viewBox="0 0 640 208" role="img" aria-label="趋势图">
+          <polyline
+            :points="trendPoints"
+            fill="none"
+            stroke="rgba(215,188,126,0.9)"
+            stroke-width="3"
+          />
+        </svg>
+      </div>
+    </section>
+
+    <footer class="ml-summary">
+      <div class="ml-summary__primary">
+        <span>{{ summaryLabels[0] }}</span>
+        <strong>{{ metric.summary[0] }}</strong>
+      </div>
+      <div class="ml-summary__secondary">
+        <div>
+          <span>{{ summaryLabels[1] }}</span>
+          <strong>{{ metric.summary[1] }}</strong>
+        </div>
+        <div>
+          <span>{{ summaryLabels[2] }}</span>
+          <strong>{{ metric.summary[2] }}</strong>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
 <style scoped>
-.ml-screen {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 14px 18px 18px;
-  background: rgba(5, 6, 7, 0.96);
-  overflow: auto;
-  z-index: 5;
+.ml-nation.is-pending .ml-metric__value,
+.ml-nation.is-pending .ml-nation__value {
+  opacity: 0.55;
 }
 
-.ml-screen__head {
+.ml-nation {
+  /* Slot percentages measured from nation-ui-base.png v2 (3840×2160) */
+  --nation-head-left: 1.6%;
+  --nation-head-top: 1.5%;
+  --nation-head-width: 50%;
+  --nation-head-height: 8%;
+
+  --nation-metric-left: 2.11%;
+  --nation-metric-width: 27.29%;
+  --nation-metric-height: 8.9%;
+
+  --nation-tabs-left: 33.2%;
+  --nation-tabs-top: 20.2%;
+  --nation-tabs-width: 36%;
+  --nation-tabs-height: 4.4%;
+
+  --nation-detail-left: 33.2%;
+  --nation-detail-top: 25.6%;
+  --nation-detail-width: 63.5%;
+  --nation-detail-height: 54%;
+
+  --nation-summary-left: 33%;
+  --nation-summary-top: 85%;
+  --nation-summary-width: 63.8%;
+  --nation-summary-height: 8.2%;
+
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  color: var(--yp-color-text-main);
+}
+
+.ml-nation__base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.ml-nation__head,
+.ml-nation__group,
+.ml-metric,
+.ml-views,
+.ml-nation__detail,
+.ml-summary {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.ml-nation__head {
+  left: var(--nation-head-left);
+  top: var(--nation-head-top);
+  width: var(--nation-head-width);
+  height: var(--nation-head-height);
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.ml-screen__en {
+.ml-nation__en {
   margin: 0;
   font-family: var(--yp-font-latin);
   font-size: 0.85rem;
@@ -163,105 +258,216 @@ const trendPoints = computed(() => {
   color: var(--yp-color-gold);
 }
 
-.ml-screen__title {
+.ml-nation__title {
   margin: 2px 0 0;
   font-family: var(--yp-font-serif);
   font-size: 1.55rem;
 }
 
-.ml-nation {
-  display: grid;
-  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
+.ml-nation__group {
+  left: 2.4%;
+  width: 26%;
+  margin: 0;
+  font-family: var(--yp-font-serif);
+  font-size: 0.92rem;
+  color: var(--yp-color-gold-bright);
+  letter-spacing: 0.04em;
 }
 
-.ml-nation__side {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 70vh;
-  overflow: auto;
+.ml-nation__group--gov {
+  top: 11.8%;
+}
+
+.ml-nation__group--power {
+  top: 48.2%;
 }
 
 .ml-metric {
+  left: var(--nation-metric-left);
+  width: var(--nation-metric-width);
+  height: var(--nation-metric-height);
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 18px;
   text-align: left;
-  border: 1px solid rgba(184, 149, 98, 0.22);
-  border-radius: 8px;
-  background: rgba(12, 14, 16, 0.55);
+  border: none;
+  border-radius: 10px;
+  background: transparent;
   color: var(--yp-color-text-main);
   cursor: pointer;
 }
 
-.ml-metric.is-active {
-  border-color: rgba(215, 188, 126, 0.7);
-  background: rgba(184, 149, 98, 0.12);
+.ml-metric__label {
+  font-family: var(--yp-font-serif);
+  font-size: 1rem;
 }
 
-.ml-metric__group {
-  font-family: var(--yp-font-latin);
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--yp-color-gold);
-}
-
-.ml-metric__row {
+.ml-metric__values {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.ml-metric__value {
+  font-family: var(--yp-font-data);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ml-metric__delta {
+  font-size: 0.72rem;
   color: var(--yp-color-text-muted);
 }
 
-.ml-metric__row span:first-child {
-  font-family: var(--yp-font-data);
-  font-weight: 700;
+.ml-metric:hover,
+.ml-metric.is-active {
+  background: rgba(184, 149, 98, 0.14);
+}
+
+.ml-metric.is-active {
+  box-shadow: inset 0 0 0 1px rgba(215, 188, 126, 0.55);
+}
+
+.ml-metric:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(215, 188, 126, 0.75);
 }
 
 .ml-views {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
+  left: var(--nation-tabs-left);
+  top: var(--nation-tabs-top);
+  width: var(--nation-tabs-width);
+  height: var(--nation-tabs-height);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  align-items: stretch;
+  padding: 0 10px;
 }
 
 .ml-view-tab {
-  padding: 8px 14px;
-  border: 1px solid rgba(184, 149, 98, 0.28);
-  border-radius: 999px;
+  border: none;
+  border-radius: 8px;
   background: transparent;
   color: var(--yp-color-text-muted);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-family: var(--yp-font-serif);
+  font-size: 0.92rem;
 }
 
 .ml-view-tab.is-active {
   color: var(--yp-color-gold-bright);
-  border-color: rgba(215, 188, 126, 0.6);
-  background: rgba(184, 149, 98, 0.12);
+  background: rgba(184, 149, 98, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(215, 188, 126, 0.45);
 }
 
-.ml-canvas {
-  margin-top: 16px;
-  min-height: 208px;
-  border: 1px dashed rgba(184, 149, 98, 0.25);
-  border-radius: 12px;
-  padding: 16px;
+.ml-view-tab:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(215, 188, 126, 0.8);
+}
+
+.ml-nation__detail {
+  left: var(--nation-detail-left);
+  top: var(--nation-detail-top);
+  width: var(--nation-detail-width);
+  height: var(--nation-detail-height);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 18px 22px 14px;
+  overflow: auto;
+}
+
+.ml-nation__detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.ml-nation__crumb {
+  margin: 0 0 6px;
+  font-family: var(--yp-font-latin);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--yp-color-gold);
+}
+
+.ml-nation__detail-title {
+  margin: 0;
+  font-family: var(--yp-font-serif);
+  font-size: 1.35rem;
+}
+
+.ml-nation__detail-desc {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--yp-color-text-muted);
+  max-width: 36em;
+}
+
+.ml-nation__detail-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ml-nation__value {
+  font-family: var(--yp-font-data);
+  font-weight: 700;
+  font-size: 1.65rem;
+}
+
+.ml-nation__delta {
+  font-size: 0.82rem;
   color: var(--yp-color-text-muted);
 }
 
-.ml-map-dots {
+.ml-canvas {
+  flex: 1;
+  min-height: 0;
+  border: 1px dashed rgba(184, 149, 98, 0.22);
+  border-radius: 12px;
+  padding: 14px;
+  color: var(--yp-color-text-muted);
+  background: rgba(8, 10, 12, 0.25);
+}
+
+.ml-canvas__placeholder {
+  margin: 0;
+  min-height: 140px;
+  height: calc(100% - 36px);
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+}
+
+.ml-map-legend {
   display: flex;
-  gap: 10px;
-  margin-top: 16px;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.85rem;
+}
+
+.ml-map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .dot {
-  width: 12px;
-  height: 12px;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
 }
 
@@ -279,7 +485,6 @@ const trendPoints = computed(() => {
 
 .ml-canvas--net {
   position: relative;
-  height: 252px;
 }
 
 .node {
@@ -325,38 +530,70 @@ const trendPoints = computed(() => {
 
 .ml-trend {
   width: 100%;
-  height: 208px;
+  height: 100%;
+  min-height: 160px;
 }
 
 .ml-summary {
+  left: var(--nation-summary-left);
+  top: var(--nation-summary-top);
+  width: var(--nation-summary-width);
+  height: var(--nation-summary-height);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 12px;
+  grid-template-columns: 34% 66%;
+  align-items: stretch;
+  padding: 0;
 }
 
-.ml-summary div {
+.ml-summary__primary,
+.ml-summary__secondary > div {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 4px;
+  padding: 8px 18px;
+  min-width: 0;
+}
+
+.ml-summary__secondary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  min-width: 0;
 }
 
 .ml-summary span {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: var(--yp-color-text-muted);
 }
 
 .ml-summary strong {
   color: var(--yp-color-gold-bright);
   font-family: var(--yp-font-serif);
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 980px) {
-  .ml-nation {
-    grid-template-columns: 1fr;
+  .ml-nation__detail-head {
+    flex-direction: column;
   }
 
-  .ml-summary {
+  .ml-nation__detail-value {
+    align-items: flex-start;
+  }
+
+  .ml-views {
+    width: 48%;
+  }
+
+  .ml-view-tab {
+    font-size: 0.78rem;
+  }
+
+  .ml-summary__secondary {
     grid-template-columns: 1fr;
   }
 }

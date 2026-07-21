@@ -1,16 +1,42 @@
 <script setup lang="ts">
-import sceneBg from './assets/oval-office.png';
+import { ref } from 'vue';
+import SceneBackdrop from './SceneBackdrop.vue';
+import type { SceneBackdropMode } from './sceneVideos';
 
-defineProps<{
-  title?: string;
+withDefaults(
+  defineProps<{
+    title?: string;
+    sceneMode?: SceneBackdropMode;
+    ambientEnabled?: boolean;
+    advisorPauseAtSec?: number;
+  }>(),
+  { ambientEnabled: false },
+);
+
+const emit = defineEmits<{
+  sceneClipEnded: [];
+  sceneClipPaused: [];
 }>();
+
+const sceneBackdropRef = ref<InstanceType<typeof SceneBackdrop> | null>(null);
+
+defineExpose({
+  getSceneBackdrop: () => sceneBackdropRef.value,
+});
 </script>
 
 <template>
   <div class="ml-shell">
     <a class="ml-shell__docs" href="#/overview">← 文档</a>
     <div class="ml-shell__stage yp-theme-default">
-      <img class="ml-shell__bg" :src="sceneBg" alt="" aria-hidden="true" />
+      <SceneBackdrop
+        ref="sceneBackdropRef"
+        :mode="sceneMode ?? 'idle'"
+        :ambient-enabled="ambientEnabled"
+        :advisor-pause-at-sec="advisorPauseAtSec"
+        @clip-ended="emit('sceneClipEnded')"
+        @clip-paused="emit('sceneClipPaused')"
+      />
       <header v-if="title || $slots.hud" class="ml-shell__hud">
         <slot name="hud" />
       </header>
@@ -74,18 +100,6 @@ defineProps<{
   color: var(--yp-color-text-main);
 }
 
-.ml-shell__bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 42%;
-  z-index: 0;
-  pointer-events: none;
-  user-select: none;
-}
-
 .ml-shell__hud {
   position: relative;
   flex-shrink: 0;
@@ -111,5 +125,6 @@ defineProps<{
   z-index: 2;
   display: flex;
   justify-content: center;
+  overflow: visible;
 }
 </style>

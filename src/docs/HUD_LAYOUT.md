@@ -171,7 +171,7 @@
 
 ## 10. 次级屏尺度（Dock 四入口）
 
-与主 HUD 定稿对齐：**大字号、边距贴 safe、数值用 Inter Bold**；不改各屏栅格结构。
+与主 HUD 定稿对齐：**大字号、边距贴 safe、数值用 Inter Bold**；三全屏信息架构以工作区根目录 `ref-publish.png`、`ref-inbox.png`、`ref-nation.png` 为结构真源，材质仍跟主 HUD。
 
 实现文件：`playground/main-loop/PublishScreen.vue`、`InboxScreen.vue`、`NationScreen.vue`、`PhoneOverlay.vue`。
 
@@ -199,3 +199,20 @@
 | 布局 | 居中浮层，z-index ≥10；**不全屏铺开** |
 
 窄屏断点仍用各文件内 `@media (max-width: 980px)` 单列，未收 Token。
+
+## 11. 场景视频层（首版：手机）
+
+主界面背景由 [`SceneBackdrop.vue`](../../playground/main-loop/SceneBackdrop.vue) 驱动，状态机见 [`MainLoopPage.vue`](../../playground/pages/MainLoopPage.vue)。
+
+| 模式 | 视频 | 行为 |
+|---|---|---|
+| `idle` | `assets/video/idle-*.mp4`（可选） | 多数时间静图；约 3–8s 后随机插播一条，播完回静图 |
+| `phone-start` | `phone-start.webm` | 点手机立刻开浮层，并行播一次 |
+| `phone-hold` | （定格 Start 末帧） | 手机 UI 打开期间 |
+| `phone-end` | `phone-end.webm` | 关浮层后播一次，再回 `idle` |
+
+资源目录：`playground/main-loop/assets/video/`（见该目录 `README.md`）。缺文件时回退 `oval-office.png`，不阻塞 UI。
+
+**分辨率：** 静图 `oval-office.png` 为 5504×3072；视频推荐 3840×2160（16:9），首帧须与静图同构图。
+
+**HUD**：手机打开时顶栏保留、底栏 Dock 隐藏；`phone-end` 期间 Dock 仍隐藏。发布/处理/国家次级屏首版不改背景视频。

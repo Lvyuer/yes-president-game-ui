@@ -24,4 +24,6 @@
   --yp-frame-select-list: url("../assets/themes/default/frames/下拉列表基础边框.png");
   --yp-select-list-ornament: url("../assets/themes/default/frames/下拉列表顶部装饰.png");
   --yp-frame-select-hover: url("../assets/themes/default/frames/下拉选项悬停.png");
+  --yp-frame-chat-bubble: url("../assets/themes/default/frames/聊天框.png");
+  --yp-frame-chat-bubble-out: url("../assets/themes/default/frames/聊天框-出站.png");
 }
