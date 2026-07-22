@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import type { MainLoopScreen } from '../main-loop/data';
 import type { SceneBackdropMode } from '../main-loop/sceneVideos';
-import type { PhoneAppId } from '../main-loop/casePortStrike';
+import type { PhoneAppId, DeskTodoId, AidePhase } from '../main-loop/casePortStrike';
 import MainLoopShell from '../main-loop/MainLoopShell.vue';
 import MainHud from '../main-loop/MainHud.vue';
 import MainScene from '../main-loop/MainScene.vue';
@@ -12,7 +12,9 @@ import InboxScreen from '../main-loop/InboxScreen.vue';
 import NationScreen from '../main-loop/NationScreen.vue';
 import PhoneOverlay from '../main-loop/PhoneOverlay.vue';
 import CrisisNotice from '../main-loop/CrisisNotice.vue';
+import CrisisImpactOverlay from '../main-loop/CrisisImpactOverlay.vue';
 import AdvisorBillsNotice from '../main-loop/AdvisorBillsNotice.vue';
+import TaskBoard from '../main-loop/TaskBoard.vue';
 import SettlementOverlay from '../main-loop/SettlementOverlay.vue';
 import SceneAlignDebug from '../main-loop/SceneAlignDebug.vue';
 import type { ResourceRollState } from '../main-loop/MainHud.vue';
@@ -50,12 +52,12 @@ const sceneMode = ref<SceneBackdropMode>('idle');
 const phoneInputLocked = ref(false);
 const initialPhoneApp = ref<PhoneAppId | null>(null);
 const advisorCueVisible = ref(false);
+const publishCueVisible = ref(false);
 const settlementOpen = ref(false);
 const settlementPresentation = ref<SettlementPresentation | null>(null);
 const resourceRoll = ref<ResourceRollState | null>(null);
 const actionNotice = ref('');
 
-let introDelayTimer: ReturnType<typeof setTimeout> | null = null;
 let settlementCardTimer: ReturnType<typeof setTimeout> | null = null;
 let resourceRollClearTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -77,6 +79,22 @@ const inboxHighlightIds = computed(() => {
 const dockHighlightAction = computed(() => {
   if (portCase.inboxHighlight.value || advisorCueVisible.value) {
     return 'inbox' as const;
+  }
+  if (portCase.publishHighlight.value || publishCueVisible.value) {
+    return 'publish' as const;
+  }
+  if (
+    portCase.deskTodos.value.some((item) => item.id === 'post-tweet' && !item.done) &&
+    portCase.dmCompleted.value &&
+    !portCase.tweetPosted.value
+  ) {
+    return 'phone' as const;
+  }
+  if (portCase.reopenPhoneHighlight.value && portCase.introComplete.value) {
+    return 'phone' as const;
+  }
+  if (portCase.aidePhoneHighlight.value && portCase.introComplete.value) {
+    return 'phone' as const;
   }
   if (portCase.crisisVisible.value && portCase.introComplete.value) {
     return 'phone' as const;
@@ -136,6 +154,15 @@ async function openSecondary(id: SecondaryScreen) {
     advisorCueVisible.value = false;
   }
 
+  if (id === 'publish') {
+    const reason = portCase.guardReasonForPublish();
+    if (reason) {
+      showActionNotice(portCase.guardMessage(reason));
+      return;
+    }
+    publishCueVisible.value = false;
+  }
+
   transitioning.value = true;
 
   try {
@@ -181,6 +208,10 @@ async function goMain() {
     prepChromeForFadeIn(mainChromeEls());
     await fadeChrome(mainChromeEls(), 1);
 
+    if (leaving === 'publish' && portCase.publishHighlight.value) {
+      publishCueVisible.value = true;
+    }
+
     if (shouldResumeAdvisor && portCase.startAdvisorLeave()) {
       advisorCueVisible.value = false;
       sceneMode.value = 'advisor-leave';
@@ -212,7 +243,6 @@ function closePhone() {
   initialPhoneApp.value = null;
   sceneMode.value = 'phone-end';
   phoneInputLocked.value = true;
-  portCase.requestAdvisorAfterPhoneClose();
 }
 
 function onCloseBlocked() {
@@ -261,7 +291,8 @@ function playSettlementPresentation() {
 }
 
 function startSettlementPresentation() {
-  if (!portCase.completeAdvisorLeave()) return;
+  if (!portCase.canSettle.value) return;
+  if (!portCase.markSettlementStarted()) return;
   playSettlementPresentation();
 }
 
@@ -288,32 +319,38 @@ function dismissSettlement() {
 }
 
 function onSceneClipEnded() {
-  if (sceneMode.value === 'intro-intruder') {
-    sceneMode.value = 'idle';
-    phoneInputLocked.value = false;
-    portCase.completeIntro();
-    return;
-  }
-
   if (sceneMode.value === 'phone-start') {
     sceneMode.value = 'phone-hold';
     return;
   }
 
   if (sceneMode.value === 'phone-end') {
-    if (portCase.consumePendingAdvisorAfterPhoneEnd()) {
-      sceneMode.value = 'advisor-arrive';
-      return;
-    }
     sceneMode.value = 'idle';
     phoneInputLocked.value = false;
+    if (portCase.canSettle.value) {
+      startSettlementPresentation();
+      return;
+    }
+    if (startAdvisorArrival()) {
+      return;
+    }
+    if (portCase.publishHighlight.value) {
+      publishCueVisible.value = true;
+    }
+    return;
+  }
+
+  if (sceneMode.value === 'publish-end') {
+    sceneMode.value = 'idle';
+    phoneInputLocked.value = false;
+    portCase.pushAideNotice();
     return;
   }
 
   if (sceneMode.value === 'advisor-leave') {
     sceneMode.value = 'idle';
     phoneInputLocked.value = false;
-    startSettlementPresentation();
+    portCase.completeAdvisorLeave();
   }
 }
 
@@ -329,6 +366,15 @@ function onSceneClipPaused() {
 function onAction(id: 'phone' | 'publish' | 'inbox' | 'nation') {
   if (transitioning.value) return;
 
+  if (
+    id !== 'phone' &&
+    portCase.reopenPending.value &&
+    !portCase.reopenWatched.value
+  ) {
+    showActionNotice(portCase.guardMessage('watch_reopen_first'));
+    return;
+  }
+
   if (id === 'phone') {
     openPhone();
     return;
@@ -341,16 +387,73 @@ function onCrisisOpen() {
   openPhone(portCase.crisis.targetApp);
 }
 
+function onReopenOpen() {
+  openPhone(portCase.reopen.targetApp);
+}
+
+function onAideNoticeOpen() {
+  openPhone(portCase.aideNotice.targetApp);
+}
+
 function onAdvisorCueOpen() {
   void openSecondary('inbox');
+}
+
+function onPublishCueOpen() {
+  void openSecondary('publish');
+}
+
+function startAdvisorArrival(): boolean {
+  if (!portCase.requestAdvisorAfterPhoneClose()) return false;
+  if (!portCase.consumePendingAdvisorAfterPhoneEnd()) return false;
+  sceneMode.value = 'advisor-arrive';
+  phoneInputLocked.value = true;
+  return true;
 }
 
 function onFtubeWatched() {
   portCase.markFtubeWatched();
 }
 
+function onReopenWatched() {
+  portCase.markReopenWatched();
+}
+
 function onNegotiationComplete() {
   portCase.completeNegotiation();
+}
+
+function onAideComplete(phase: AidePhase) {
+  if (phase === 'briefing') {
+    portCase.completeAideBriefing();
+    return;
+  }
+  portCase.completeAideChat();
+}
+
+function onFelegramProgress(payload: {
+  contactId: 'union' | 'media' | 'vance' | 'aide';
+  replyCount: number;
+}) {
+  portCase.setFelegramReplyCount(payload.contactId, payload.replyCount);
+}
+
+function onDeskTodoSelect(id: DeskTodoId) {
+  const item = portCase.deskTodos.value.find((entry) => entry.id === id);
+  if (!item || item.done) return;
+
+  if (item.action === 'publish') {
+    if (phoneOpen.value) {
+      phoneOpen.value = false;
+      initialPhoneApp.value = null;
+      sceneMode.value = 'idle';
+      phoneInputLocked.value = false;
+    }
+    void openSecondary('publish');
+    return;
+  }
+
+  openPhone(item.phoneApp ?? 'f');
 }
 
 function onTweetPosted() {
@@ -373,7 +476,19 @@ function inboxItemGuard(id: string): string | null {
 }
 
 async function onPublish(_payload: { direction: string; body: string }) {
+  if (!portCase.publishBill()) {
+    const reason = portCase.guardReasonForPublish();
+    if (reason) {
+      showActionNotice(portCase.guardMessage(reason));
+    }
+    return;
+  }
+
   await goMain();
+  publishCueVisible.value = false;
+  sceneMode.value = 'publish-end';
+  phoneInputLocked.value = true;
+  showActionNotice(portCase.publishSuccessMessage);
 }
 
 async function onDecide(payload: { id: string; title: string; decision: string }) {
@@ -384,7 +499,7 @@ async function onDecide(payload: { id: string; title: string; decision: string }
     portCase.signBill(payload.id);
   }
 
-  // 幕僚定格期间：两份案例法案都签完才关 Inbox；签完一份留在界面继续处理
+  // 幕僚定格期间：案例法案签完才关 Inbox
   if (
     isCaseBill &&
     portCase.advisorPhase.value === 'hold' &&
@@ -400,6 +515,7 @@ onMounted(() => {
   if (isSettlementPreviewEnabled()) {
     phoneInputLocked.value = false;
     portCase.completeIntro();
+    portCase.primeSettlementPreview();
     playSettlementPresentation();
     return;
   }
@@ -430,18 +546,11 @@ onMounted(() => {
     return;
   }
 
-  phoneInputLocked.value = true;
-  introDelayTimer = window.setTimeout(() => {
-    introDelayTimer = null;
-    sceneMode.value = 'intro-intruder';
-  }, portCase.intro.delayMs);
+  phoneInputLocked.value = false;
+  portCase.completeIntro();
 });
 
 onBeforeUnmount(() => {
-  if (introDelayTimer !== null) {
-    window.clearTimeout(introDelayTimer);
-    introDelayTimer = null;
-  }
   clearSettlementTimers();
   killScreenTransition();
 });
@@ -468,12 +577,36 @@ onBeforeUnmount(() => {
 
     <MainScene ref="mainSceneRef" v-show="screen === 'main'" class="ml-chrome">
       <CrisisNotice
-        :visible="portCase.crisisVisible.value && portCase.introComplete.value"
-        :title="portCase.crisis.title"
-        :message="portCase.crisis.message"
-        :subline="portCase.crisis.subline"
-        @open="onCrisisOpen"
-        @dismiss="portCase.dismissCrisis()"
+        :visible="portCase.reopenVisible.value"
+        :title="portCase.reopen.title"
+        :message="portCase.reopen.message"
+        :subline="portCase.reopen.subline"
+        :notice-title="portCase.reopen.noticeTitle"
+        :cta="portCase.reopen.cta"
+        :tone="portCase.reopen.tone"
+        aria-label="复工现场更新"
+        @open="onReopenOpen"
+        @dismiss="portCase.dismissReopenNotice()"
+      />
+      <CrisisNotice
+        :visible="portCase.aideNoticeVisible.value"
+        :title="portCase.aideNotice.title"
+        :message="portCase.aideNotice.message"
+        :subline="portCase.aideNotice.subline"
+        :notice-title="portCase.aideNotice.noticeTitle"
+        :cta="portCase.aideNotice.cta"
+        :tone="portCase.aideNotice.tone"
+        aria-label="幕僚消息推送"
+        @open="onAideNoticeOpen"
+        @dismiss="portCase.dismissAideNotice()"
+      />
+      <AdvisorBillsNotice
+        :visible="publishCueVisible"
+        :title="portCase.publishCue.title"
+        :message="portCase.publishCue.message"
+        :subline="portCase.publishCue.subline"
+        :cta="portCase.publishCue.cta"
+        @open="onPublishCueOpen"
       />
       <AdvisorBillsNotice
         :visible="advisorCueVisible"
@@ -491,6 +624,8 @@ onBeforeUnmount(() => {
     <PublishScreen
       v-if="screen === 'publish'"
       ref="publishScreenRef"
+      :showcase-direction-id="portCase.publishDraft.directionId"
+      :showcase-body="portCase.publishDraft.body"
       @back="goMain"
       @publish="onPublish"
     />
@@ -518,21 +653,45 @@ onBeforeUnmount(() => {
     </template>
 
     <template #overlays>
+      <CrisisImpactOverlay
+        :open="portCase.crisisVisible.value && portCase.introComplete.value"
+        :title="portCase.crisis.title"
+        :message="portCase.crisis.message"
+        :subline="portCase.crisis.subline"
+        :hints="portCase.crisis.impactHints"
+        @open="onCrisisOpen"
+        @dismiss="portCase.dismissCrisis()"
+      />
       <PhoneOverlay
         :open="phoneOpen"
         :initial-app="initialPhoneApp"
         :app-badges="portCase.appBadges.value"
+        :ftube-episode="portCase.ftubeEpisode.value"
         :ftube-watched="portCase.ftubeWatched.value"
+        :reopen-watched="portCase.reopenWatched.value"
         :dm-completed="portCase.dmCompleted.value"
+        :aide-unlocked="portCase.aideUnlocked.value"
+        :aide-briefing-completed="portCase.aideBriefingCompleted.value"
+        :aide-phase="portCase.aidePhase.value"
+        :felegram-reply-counts="portCase.felegramReplyCounts.value"
+        :aide-investigation-reply-count="portCase.aideInvestigationReplyCount.value"
         :tweet-posted="portCase.tweetPosted.value"
         :can-close="portCase.canClosePhone.value"
         :guard-for-app="guardForApp"
         @close="closePhone"
         @close-blocked="onCloseBlocked"
         @ftube-watched="onFtubeWatched"
+        @reopen-watched="onReopenWatched"
         @negotiation-complete="onNegotiationComplete"
+        @aide-complete="onAideComplete"
+        @felegram-progress="onFelegramProgress"
         @tweet-posted="onTweetPosted"
         @hot-search-seen="onHotSearchSeen"
+      />
+      <TaskBoard
+        v-if="screen === 'main'"
+        :items="portCase.deskTodos.value"
+        @select="onDeskTodoSelect"
       />
       <SettlementOverlay
         :open="settlementOpen"

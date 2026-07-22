@@ -140,7 +140,7 @@ function submitDecision() {
       <GameButton variant="secondary" @click="emit('back')">返回</GameButton>
       <div>
         <p class="ml-inbox__en">EXECUTIVE INBOX</p>
-        <h2 class="ml-inbox__title">处理法案</h2>
+        <h2 class="ml-inbox__title">处理文件</h2>
       </div>
     </header>
 
@@ -247,7 +247,7 @@ function submitDecision() {
       </template>
 
       <div v-else class="ml-inbox__empty">
-        <p>暂无待处理法案</p>
+        <p>暂无待处理文件</p>
       </div>
     </section>
   </div>

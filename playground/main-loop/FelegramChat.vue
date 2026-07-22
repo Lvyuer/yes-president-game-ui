@@ -1,23 +1,51 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import {
+  AIDE_BRIEFING_ACT,
   FELEGRAM_CONTACTS,
+  buildFelegramHistory,
   pickFelegramReply,
+  resolveAideContact,
+  type AidePhase,
+  type FelegramBubble,
   type FelegramContactId,
   type FelegramContactScript,
+  type FelegramHistoryMessage,
+  type FelegramStickerId,
   type NegotiationOption,
 } from './casePortStrike';
 import chatBase from './assets/felegram-chat-ui-base.png';
+import stickerForTheWorkers from './assets/sticker-for-the-workers.png';
+import stickerThisIsFine from './assets/sticker-this-is-fine.png';
 import { killPhoneMotion, playPop, playPush } from './phoneMotion';
 
-const props = defineProps<{
-  locked: boolean;
-  completed: boolean;
-  guardMessage?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    locked: boolean;
+    completed: boolean;
+    /** When false, the aide contact stays hidden from the list. */
+    aideUnlocked?: boolean;
+    aideBriefingCompleted?: boolean;
+    aidePhase?: AidePhase;
+    /** Persisted reply progress from the case store (survives phone remounts). */
+    replyCounts?: Partial<Record<FelegramContactId, number>>;
+    /** Investigation-act reply progress (separate from briefing). */
+    aideInvestigationReplyCount?: number;
+    guardMessage?: string;
+  }>(),
+  {
+    aideUnlocked: false,
+    aideBriefingCompleted: false,
+    aidePhase: 'briefing',
+    replyCounts: () => ({}),
+    aideInvestigationReplyCount: 0,
+  },
+);
 
 const emit = defineEmits<{
   complete: [option: NegotiationOption];
+  aideComplete: [phase: AidePhase];
+  progress: [payload: { contactId: FelegramContactId; replyCount: number }];
 }>();
 
 type View = 'contacts' | 'chat';
@@ -26,14 +54,19 @@ type ChatRole = 'them' | 'me' | 'system';
 type ChatMessage = {
   id: string;
   role: ChatRole;
-  text: string;
+  text?: string;
+  stickerSrc?: string;
+};
+
+const STICKER_SRC: Record<FelegramStickerId, string> = {
+  'for-the-workers': stickerForTheWorkers,
+  'this-is-fine': stickerThisIsFine,
 };
 
 type ThreadState = {
   messages: ChatMessage[];
   replyCount: number;
   waiting: boolean;
-  caseEmitted: boolean;
 };
 
 const view = ref<View>('contacts');
@@ -46,48 +79,160 @@ const threadRef = ref<HTMLElement | null>(null);
 const typing = ref(false);
 const contactsRef = ref<HTMLElement | null>(null);
 const chatRef = ref<HTMLElement | null>(null);
+const caseEmitted = ref(Boolean(props.completed));
 
 let replyTimer: ReturnType<typeof setTimeout> | null = null;
 let msgSeq = 0;
+let aideThreadPhase: AidePhase = props.aidePhase;
+
+function nextId(prefix: string): string {
+  msgSeq += 1;
+  return `${prefix}-${msgSeq}`;
+}
+
+function savedReplyCount(contactId: FelegramContactId): number {
+  if (contactId === 'aide' && props.aidePhase === 'investigation') {
+    return props.aideInvestigationReplyCount ?? 0;
+  }
+  return props.replyCounts?.[contactId] ?? 0;
+}
+
+function historyToMessages(history: FelegramHistoryMessage[]): ChatMessage[] {
+  return history.map((entry) => {
+    if ('stickerId' in entry) {
+      return {
+        id: nextId('hist'),
+        role: 'them' as const,
+        stickerSrc: STICKER_SRC[entry.stickerId],
+      };
+    }
+    return {
+      id: nextId('hist'),
+      role: entry.role,
+      text: entry.text,
+    };
+  });
+}
+
+function buildContactScript(contactId: FelegramContactId): FelegramContactScript {
+  if (contactId === 'aide') {
+    return resolveAideContact(props.aidePhase);
+  }
+  return FELEGRAM_CONTACTS.find((item) => item.id === contactId)!;
+}
+
+function hydrateThread(contactId: FelegramContactId): ThreadState {
+  const script = buildContactScript(contactId);
+  const replyCount = savedReplyCount(contactId);
+  return {
+    messages: historyToMessages(buildFelegramHistory(script, replyCount)),
+    replyCount,
+    waiting: false,
+  };
+}
 
 const threads = reactive<Record<FelegramContactId, ThreadState>>(
   Object.fromEntries(
-    FELEGRAM_CONTACTS.map((contact) => [
-      contact.id,
-      {
-        messages: contact.openingMessages.map((text) => ({
-          id: nextId('open'),
-          role: 'them' as const,
-          text,
-        })),
-        replyCount: 0,
-        waiting: false,
-        caseEmitted: false,
-      },
-    ]),
+    FELEGRAM_CONTACTS.map((contact) => [contact.id, hydrateThread(contact.id)]),
   ) as Record<FelegramContactId, ThreadState>,
 );
 
-const activeContact = computed(
-  () => FELEGRAM_CONTACTS.find((item) => item.id === activeContactId.value) ?? null,
+const activeContact = computed(() =>
+  activeContactId.value ? buildContactScript(activeContactId.value) : null,
 );
 
 const activeThread = computed(() =>
   activeContactId.value ? threads[activeContactId.value] : null,
 );
 
+const visibleContacts = computed(() =>
+  FELEGRAM_CONTACTS.filter(
+    (contact) => contact.id !== 'aide' || Boolean(props.aideUnlocked),
+  ),
+);
+
+const contactChatLocked = computed(() => {
+  if (!activeContact.value) return false;
+  return !isContactAvailable(activeContact.value.id);
+});
+
+const contactLockMessage = computed(() => {
+  const id = activeContact.value?.id;
+  if (id === 'media') {
+    if (!props.aideBriefingCompleted) {
+      return '先和幕僚把情况聊清楚，再来找他们。';
+    }
+    return '先和工会领袖把补偿谈妥，再来找媒体部。';
+  }
+  if (id === 'union' || id === 'vance') {
+    return '先和幕僚把情况聊清楚，再来找他们。';
+  }
+  return '先完成当前指引的对话。';
+});
+
 const canSend = computed(
   () =>
     !props.locked &&
+    !contactChatLocked.value &&
     Boolean(activeContact.value) &&
     Boolean(activeThread.value) &&
     !activeThread.value!.waiting &&
     draft.value.trim().length > 0,
 );
 
-function nextId(prefix: string): string {
-  msgSeq += 1;
-  return `${prefix}-${msgSeq}`;
+function isBriefingContactDone(contactId: FelegramContactId): boolean {
+  if (contactId === 'aide') {
+    return (
+      props.aideBriefingCompleted ||
+      Math.max(threads.aide.replyCount, props.replyCounts?.aide ?? 0) >=
+        AIDE_BRIEFING_ACT.beats.length
+    );
+  }
+  const contact = FELEGRAM_CONTACTS.find((item) => item.id === contactId)!;
+  const count = Math.max(threads[contactId].replyCount, savedReplyCount(contactId));
+  return count >= contact.beats.length;
+}
+
+/** Progressive unlock: aide → union/vance → media. */
+function isContactAvailable(contactId: FelegramContactId): boolean {
+  if (contactId === 'aide') return Boolean(props.aideUnlocked);
+  if (contactId === 'union' || contactId === 'vance') {
+    return Boolean(props.aideBriefingCompleted);
+  }
+  if (contactId === 'media') {
+    return Boolean(props.aideBriefingCompleted) && isBriefingContactDone('union');
+  }
+  return true;
+}
+
+function isContactScriptDone(contact: FelegramContactScript): boolean {
+  if (contact.id === 'aide' && props.aidePhase === 'briefing') {
+    return isBriefingContactDone('aide');
+  }
+  const count = Math.max(threads[contact.id].replyCount, savedReplyCount(contact.id));
+  return count >= contact.beats.length;
+}
+
+function isContactPending(contact: FelegramContactScript): boolean {
+  if (!isContactAvailable(contact.id)) return false;
+
+  if (contact.id === 'aide') {
+    if (props.aidePhase === 'investigation') {
+      return !isContactScriptDone(resolveAideContact('investigation'));
+    }
+    if (props.aideBriefingCompleted) return false;
+    return !isBriefingContactDone('aide');
+  }
+
+  return !isContactScriptDone(contact);
+}
+
+function allRequiredContactsDone(): boolean {
+  return (
+    isBriefingContactDone('aide') &&
+    isBriefingContactDone('union') &&
+    isBriefingContactDone('media')
+  );
 }
 
 function clearReplyTimer() {
@@ -96,6 +241,24 @@ function clearReplyTimer() {
     replyTimer = null;
   }
 }
+
+function resetAideThreadForPhase(phase: AidePhase) {
+  clearReplyTimer();
+  typing.value = false;
+  aideThreadPhase = phase;
+  const next = hydrateThread('aide');
+  threads.aide.messages = next.messages;
+  threads.aide.replyCount = next.replyCount;
+  threads.aide.waiting = false;
+}
+
+watch(
+  () => props.aidePhase,
+  (phase) => {
+    if (phase === aideThreadPhase) return;
+    resetAideThreadForPhase(phase);
+  },
+);
 
 async function openChat(contact: FelegramContactScript) {
   if (props.locked || navLocked.value) return;
@@ -154,8 +317,7 @@ async function sendMessage() {
   const text = draft.value.trim();
   draft.value = '';
 
-  // Player bubble shows real input; NPC reply still follows the fixed demo script.
-  const { reply, scriptComplete, completesCase } = pickFelegramReply(
+  const { player, replies, scriptComplete } = pickFelegramReply(
     contact,
     text,
     thread.replyCount,
@@ -170,44 +332,105 @@ async function sendMessage() {
   await nextTick();
   scrollThread();
 
-  const delayMs = 1100 + Math.floor(Math.random() * 900);
+  clearReplyTimer();
   typing.value = true;
   await nextTick();
   scrollThread();
 
-  clearReplyTimer();
-  replyTimer = setTimeout(async () => {
+  const firstDelayMs = 1100 + Math.floor(Math.random() * 900);
+  replyTimer = setTimeout(() => {
+    void deliverNpcReplies(contact, thread, player, replies, scriptComplete);
+  }, firstDelayMs);
+}
+
+async function deliverNpcReplies(
+  contact: FelegramContactScript,
+  thread: ThreadState,
+  player: string,
+  replies: FelegramBubble[],
+  scriptComplete: boolean,
+) {
+  replyTimer = null;
+
+  for (let index = 0; index < replies.length; index += 1) {
+    const bubble = replies[index]!;
     typing.value = false;
-    thread.replyCount += 1;
-    thread.messages.push({
-      id: nextId('them'),
-      role: 'them',
-      text: reply,
-    });
-
-    if (scriptComplete) {
-      thread.messages.push({
-        id: nextId('sys'),
-        role: 'system',
-        text: contact.outcome,
-      });
-    }
-
-    if (completesCase && !thread.caseEmitted && !props.completed) {
-      thread.caseEmitted = true;
-      thread.messages.push({
-        id: nextId('sys'),
-        role: 'system',
-        text: '可发推或签署补偿法案',
-      });
-      emit('complete', resolveCaseOption(text, reply));
-    }
-
-    thread.waiting = false;
-    replyTimer = null;
+    thread.messages.push(toThreadMessage(bubble));
     await nextTick();
     scrollThread();
-  }, delayMs);
+
+    const hasMore = index < replies.length - 1;
+    if (!hasMore) break;
+
+    typing.value = true;
+    await nextTick();
+    scrollThread();
+    await waitMs(650 + Math.floor(Math.random() * 550));
+  }
+
+  thread.replyCount += 1;
+  emit('progress', { contactId: contact.id, replyCount: thread.replyCount });
+
+  if (scriptComplete) {
+    thread.messages.push({
+      id: nextId('sys'),
+      role: 'system',
+      text: contact.outcome,
+    });
+  }
+
+  if (scriptComplete && contact.id === 'aide') {
+    emit('aideComplete', props.aidePhase);
+  }
+
+  if (
+    scriptComplete &&
+    (contact.id === 'union' || contact.id === 'media' || contact.id === 'aide') &&
+    allRequiredContactsDone() &&
+    !caseEmitted.value &&
+    !props.completed
+  ) {
+    caseEmitted.value = true;
+    thread.messages.push({
+      id: nextId('sys'),
+      role: 'system',
+      text: '可发推，随后去发布补偿法案',
+    });
+    const summary = replies
+      .map((item) => (item.kind === 'text' ? item.text : '[表情包]'))
+      .join('\n');
+    emit('complete', resolveCaseOption(player, summary));
+  }
+
+  typing.value = false;
+  thread.waiting = false;
+  await nextTick();
+  scrollThread();
+}
+
+function toThreadMessage(bubble: FelegramBubble): ChatMessage {
+  if (bubble.kind === 'sticker') {
+    return {
+      id: nextId('them'),
+      role: 'them',
+      stickerSrc: STICKER_SRC[bubble.id],
+    };
+  }
+
+  return {
+    id: nextId('them'),
+    role: 'them',
+    text: bubble.text,
+  };
+}
+
+function waitMs(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    replyTimer = setTimeout(() => {
+      replyTimer = null;
+      resolve();
+    }, ms);
+  });
 }
 
 function onInputKeydown(event: KeyboardEvent) {
@@ -256,7 +479,7 @@ onBeforeUnmount(() => {
 
       <div v-else class="ml-felegram__list" aria-label="消息列表">
         <button
-          v-for="contact in FELEGRAM_CONTACTS"
+          v-for="contact in visibleContacts"
           :key="contact.id"
           type="button"
           class="ml-felegram__row"
@@ -265,6 +488,11 @@ onBeforeUnmount(() => {
           <span class="ml-felegram__avatar" aria-hidden="true">
             <span class="ml-felegram__avatar-head" />
             <span class="ml-felegram__avatar-body" />
+            <span
+              v-if="isContactPending(contact)"
+              class="ml-felegram__row-badge"
+              aria-label="未回复完"
+            />
           </span>
           <span class="ml-felegram__row-name">{{ contact.name }}</span>
           <span class="ml-felegram__row-time">{{ contact.time }}</span>
@@ -302,6 +530,10 @@ onBeforeUnmount(() => {
         <p>{{ props.guardMessage }}</p>
       </div>
 
+      <div v-else-if="contactChatLocked" class="ml-felegram__guard">
+        <p>{{ contactLockMessage }}</p>
+      </div>
+
       <template v-else-if="activeThread">
         <div ref="threadRef" class="ml-felegram__thread">
           <TransitionGroup name="ml-bubble" tag="div" class="ml-felegram__thread-list">
@@ -310,13 +542,23 @@ onBeforeUnmount(() => {
               :key="message.id"
               class="ml-felegram__bubble"
               :class="{
-                'yp-framed yp-framed--chat-bubble ml-felegram__bubble--in': message.role === 'them',
-                'yp-framed yp-framed--chat-bubble-out ml-felegram__bubble--out': message.role === 'me',
+                'yp-framed yp-framed--chat-bubble ml-felegram__bubble--in':
+                  message.role === 'them' && !message.stickerSrc,
+                'yp-framed yp-framed--chat-bubble-out ml-felegram__bubble--out':
+                  message.role === 'me',
                 'ml-felegram__bubble--system': message.role === 'system',
+                'ml-felegram__bubble--sticker': Boolean(message.stickerSrc),
               }"
             >
+              <img
+                v-if="message.stickerSrc"
+                class="ml-felegram__sticker"
+                :src="message.stickerSrc"
+                alt="表情包"
+                draggable="false"
+              />
               <div
-                v-if="message.role !== 'system'"
+                v-else-if="message.role !== 'system'"
                 class="yp-framed__content ml-felegram__bubble-inner"
               >
                 {{ message.text }}
@@ -617,6 +859,17 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
 }
 
+.ml-felegram__row-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff3b30;
+  box-shadow: 0 0 0 2px #000;
+}
+
 .ml-felegram__row-name {
   font-family: var(--yp-font-sans);
   font-size: 0.95rem;
@@ -705,6 +958,22 @@ onBeforeUnmount(() => {
   align-self: center;
   min-height: 0;
   max-width: 100%;
+}
+
+.ml-felegram__bubble--sticker {
+  align-self: flex-start;
+  min-height: 0;
+  max-width: 46%;
+  background: transparent;
+}
+
+.ml-felegram__sticker {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  user-select: none;
+  pointer-events: none;
 }
 
 .ml-felegram__status {

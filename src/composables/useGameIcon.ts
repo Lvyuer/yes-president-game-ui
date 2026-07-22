@@ -3,7 +3,7 @@ import chartIcon from '@/assets/themes/default/icons/chart.svg';
 import closeIcon from '@/assets/themes/default/icons/close.svg';
 import documentIcon from '@/assets/themes/default/icons/document.png';
 import gavelIcon from '@/assets/themes/default/icons/gavel.png';
-import loyaltyIcon from '@/assets/themes/default/icons/loyalty.png';
+import supportIcon from '@/assets/themes/default/icons/support.png';
 import nationIcon from '@/assets/themes/default/icons/nation.png';
 import phoneIcon from '@/assets/themes/default/icons/phone.png';
 import playIcon from '@/assets/themes/default/icons/play.svg';
@@ -17,7 +17,7 @@ const iconMap: Record<string, string> = {
   close: closeIcon,
   document: documentIcon,
   gavel: gavelIcon,
-  loyalty: loyaltyIcon,
+  support: supportIcon,
   nation: nationIcon,
   phone: phoneIcon,
   play: playIcon,

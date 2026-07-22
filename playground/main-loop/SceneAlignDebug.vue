@@ -19,7 +19,7 @@ const clips: { id: SceneVideoClip; label: string }[] = [
   { id: 'idle', label: 'idle' },
   { id: 'phone-start', label: 'phone-start' },
   { id: 'phone-end', label: 'phone-end' },
-  { id: 'intro-intruder', label: 'intro-intruder' },
+  { id: 'publish-bill-end', label: 'publish-bill-end' },
   { id: 'advisor-signing', label: 'advisor-signing' },
 ];
 

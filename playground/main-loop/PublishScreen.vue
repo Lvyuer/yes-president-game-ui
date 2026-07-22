@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { GameButton } from '@/index';
 import { DIRECTIONS } from './data';
 import publishBase from './assets/publish-ui-base.png';
+
+const props = defineProps<{
+  showcaseDirectionId?: string | null;
+  showcaseBody?: string | null;
+}>();
 
 const emit = defineEmits<{
   back: [];
@@ -19,6 +24,22 @@ const bodyTooShort = computed(
 const canSubmit = computed(
   () => !!selected.value && body.value.trim().length >= 8,
 );
+
+const showcaseActive = computed(
+  () => !!props.showcaseDirectionId && !!props.showcaseBody,
+);
+
+onMounted(() => {
+  if (props.showcaseDirectionId) {
+    selected.value = props.showcaseDirectionId;
+  }
+});
+
+function applyShowcaseDraft() {
+  if (!props.showcaseDirectionId || !props.showcaseBody) return;
+  selected.value = props.showcaseDirectionId;
+  body.value = props.showcaseBody;
+}
 
 function submit() {
   if (!canSubmit.value || !selected.value) return;
@@ -95,12 +116,24 @@ function submit() {
       <p v-if="bodyTooShort" class="ml-publish__hint">
         法案内容过短，请至少写一句完整表述
       </p>
+      <p v-else-if="showcaseActive && !body.trim()" class="ml-publish__hint ml-publish__hint--guide">
+        示范草案已选好方向，填入正文后即可颁布
+      </p>
 
       <footer class="ml-publish__footer">
         <p class="ml-publish__disclaimer">
           草稿仅供 AI 辅助草拟，无决策或法律效益保障
         </p>
-        <GameButton :disabled="!canSubmit" @click="submit">确认起草</GameButton>
+        <div class="ml-publish__actions">
+          <GameButton
+            v-if="showcaseActive"
+            variant="secondary"
+            @click="applyShowcaseDraft"
+          >
+            填入示范草案
+          </GameButton>
+          <GameButton :disabled="!canSubmit" @click="submit">确认颁布</GameButton>
+        </div>
       </footer>
     </section>
   </div>
@@ -354,6 +387,17 @@ function submit() {
   color: var(--yp-color-warning);
 }
 
+.ml-publish__hint--guide {
+  color: var(--yp-color-text-muted);
+}
+
+.ml-publish__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 .ml-publish__footer {
   display: flex;
   align-items: center;
@@ -377,6 +421,11 @@ function submit() {
   }
 
   .ml-publish__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ml-publish__actions {
     flex-direction: column;
     align-items: stretch;
   }

@@ -1,17 +1,33 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { GameNotice } from '@/index';
+import type { GameNoticeTone } from '@/types';
 
-const props = defineProps<{
-  title: string;
-  message: string;
-  subline?: string;
-  visible: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    title: string;
+    message: string;
+    subline?: string;
+    visible: boolean;
+    noticeTitle?: string;
+    cta?: string;
+    tone?: GameNoticeTone;
+    ariaLabel?: string;
+  }>(),
+  {
+    noticeTitle: '危机推送',
+    cta: '查看现场',
+    tone: 'danger',
+    ariaLabel: '危机推送',
+  },
+);
 
 const emit = defineEmits<{
   open: [];
   dismiss: [];
 }>();
+
+const isWarning = computed(() => props.tone === 'warning');
 
 function onOpen() {
   emit('open');
@@ -25,16 +41,17 @@ function onOpen() {
       v-if="props.visible"
       type="button"
       class="ml-crisis"
-      aria-label="危机推送"
+      :class="{ 'is-warning': isWarning }"
+      :aria-label="props.ariaLabel"
       @click="onOpen"
     >
-      <GameNotice title="危机推送" tone="danger">
+      <GameNotice :title="props.noticeTitle" :tone="props.tone">
         <div class="ml-crisis__body">
           <h4 class="ml-crisis__headline">{{ props.title }}</h4>
           <p class="ml-crisis__message">{{ props.message }}</p>
           <p v-if="props.subline" class="ml-crisis__meta">{{ props.subline }}</p>
           <div class="ml-crisis__footer">
-            <span class="ml-crisis__cta">查看现场</span>
+            <span class="ml-crisis__cta">{{ props.cta }}</span>
             <span class="ml-crisis__arrow" aria-hidden="true">→</span>
           </div>
         </div>
@@ -55,6 +72,10 @@ function onOpen() {
   cursor: pointer;
   text-align: left;
   animation: ml-crisis-pulse 2.8s ease-in-out infinite;
+}
+
+.ml-crisis.is-warning {
+  animation-name: ml-crisis-pulse-warning;
 }
 
 .ml-crisis :deep(.yp-notice) {
@@ -79,7 +100,6 @@ function onOpen() {
   filter: brightness(1.08);
 }
 
-/* 压缩通知框内边距，给文案更多呼吸空间 */
 .ml-crisis :deep(.yp-notice__inner) {
   display: flex;
   flex-direction: column;
@@ -95,6 +115,10 @@ function onOpen() {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #f0b0b0;
+}
+
+.ml-crisis.is-warning :deep(.yp-notice__title) {
+  color: #e8c98a;
 }
 
 .ml-crisis__body {
@@ -126,6 +150,10 @@ function onOpen() {
   line-height: 1.4;
   letter-spacing: 0.02em;
   color: rgba(240, 176, 176, 0.78);
+}
+
+.ml-crisis.is-warning .ml-crisis__meta {
+  color: rgba(212, 192, 138, 0.82);
 }
 
 .ml-crisis__footer {
@@ -184,6 +212,16 @@ function onOpen() {
   }
   50% {
     filter: drop-shadow(0 8px 22px rgba(120, 32, 32, 0.35));
+  }
+}
+
+@keyframes ml-crisis-pulse-warning {
+  0%,
+  100% {
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+  }
+  50% {
+    filter: drop-shadow(0 8px 22px rgba(120, 88, 32, 0.35));
   }
 }
 

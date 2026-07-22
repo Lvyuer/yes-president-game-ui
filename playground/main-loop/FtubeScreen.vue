@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import gsap from 'gsap';
-import { PORT_STRIKE_VIDEO_SRC } from './casePortStrike';
+import {
+  PORT_STRIKE_REOPEN_VIDEO_SRC,
+  PORT_STRIKE_VIDEO_SRC,
+} from './casePortStrike';
+import type { FtubeEpisode } from './casePortStrike';
 import ftubeBase from './assets/ftube-ui-base.png';
+import ftubeReopenBase from './assets/ftube-ui-reopen-base.png';
 import {
   killMediaMotion,
   playCollapseTo,
@@ -12,6 +17,7 @@ import {
 const props = defineProps<{
   locked: boolean;
   watched: boolean;
+  episode?: FtubeEpisode;
   /** False while phone open intro is still playing — blocks hit races. */
   interactive?: boolean;
   guardMessage?: string;
@@ -21,13 +27,20 @@ const emit = defineEmits<{
   watched: [];
 }>();
 
-/** Matches the featured card slot on ftube-ui-base.png (measured white box). */
-const CARD = {
-  left: 2.78,
-  top: 34.73,
-  width: 94.38,
-  height: 28.55,
-} as const;
+const isReopen = computed(() => props.episode === 'reopen');
+
+const baseSrc = computed(() => (isReopen.value ? ftubeReopenBase : ftubeBase));
+
+const videoSrc = computed(() =>
+  isReopen.value ? PORT_STRIKE_REOPEN_VIDEO_SRC : PORT_STRIKE_VIDEO_SRC,
+);
+
+/** Featured video card slot — measured from each episode's UI base (1440×2560). */
+const CARD = computed(() =>
+  isReopen.value
+    ? { left: 2.78, top: 34.61, width: 94.79, height: 25.7 }
+    : { left: 2.78, top: 34.73, width: 94.38, height: 28.55 },
+);
 
 const rootRef = ref<HTMLElement | null>(null);
 const hitRef = ref<HTMLButtonElement | null>(null);
@@ -41,11 +54,12 @@ function containerRect(): DOMRect | null {
 }
 
 function cardRect(container: DOMRect): DOMRect {
+  const card = CARD.value;
   return new DOMRect(
-    container.left + (CARD.left / 100) * container.width,
-    container.top + (CARD.top / 100) * container.height,
-    (CARD.width / 100) * container.width,
-    (CARD.height / 100) * container.height,
+    container.left + (card.left / 100) * container.width,
+    container.top + (card.top / 100) * container.height,
+    (card.width / 100) * container.width,
+    (card.height / 100) * container.height,
   );
 }
 
@@ -68,12 +82,13 @@ function fromRect(container: DOMRect): DOMRect {
 function snapPlayerToCard() {
   const node = playerRef.value;
   if (!node) return;
+  const card = CARD.value;
   gsap.set(node, {
     opacity: 1,
-    left: `${CARD.left}%`,
-    top: `${CARD.top}%`,
-    width: `${CARD.width}%`,
-    height: `${CARD.height}%`,
+    left: `${card.left}%`,
+    top: `${card.top}%`,
+    width: `${card.width}%`,
+    height: `${card.height}%`,
     borderRadius: '6px',
     pointerEvents: 'auto',
     clearProps: 'transform',
@@ -185,7 +200,7 @@ onBeforeUnmount(() => {
     class="ml-ftube"
     :class="{ 'is-nav-locked': navLocked, 'is-inert': props.interactive === false }"
   >
-    <img class="ml-ftube__base" :src="ftubeBase" alt="" draggable="false" />
+    <img class="ml-ftube__base" :src="baseSrc" alt="" draggable="false" />
 
     <div v-if="props.locked" class="ml-ftube__guard">
       <p>{{ props.guardMessage }}</p>
@@ -198,7 +213,13 @@ onBeforeUnmount(() => {
       class="ml-ftube__hit"
       :class="{ 'is-hidden': playerOpen }"
       :tabindex="playerOpen ? -1 : 0"
-      aria-label="播放现场视频"
+      :style="{
+        left: `${CARD.left}%`,
+        top: `${CARD.top}%`,
+        width: `${CARD.width}%`,
+        height: `${CARD.height}%`,
+      }"
+      :aria-label="isReopen ? '播放复工视频' : '播放现场视频'"
       @click.stop="openPlayer"
     >
       <span class="ml-ftube__play-icon" aria-hidden="true">
@@ -214,14 +235,20 @@ onBeforeUnmount(() => {
       ref="playerRef"
       class="ml-ftube__player"
       role="dialog"
-      aria-label="现场视频播放器"
+      :aria-label="isReopen ? '复工视频播放器' : '现场视频播放器'"
+      :style="{
+        left: `${CARD.left}%`,
+        top: `${CARD.top}%`,
+        width: `${CARD.width}%`,
+        height: `${CARD.height}%`,
+      }"
     >
       <button type="button" class="ml-ftube__player-close" @click.stop="closePlayer">关闭</button>
 
       <video
         ref="videoRef"
         class="ml-ftube__player-video"
-        :src="PORT_STRIKE_VIDEO_SRC"
+        :src="videoSrc"
         controls
         playsinline
         autoplay
@@ -273,10 +300,6 @@ onBeforeUnmount(() => {
 
 .ml-ftube__hit {
   position: absolute;
-  left: 2.78%;
-  top: 34.73%;
-  width: 94.38%;
-  height: 28.55%;
   z-index: 2;
   display: grid;
   place-items: center;
@@ -305,13 +328,8 @@ onBeforeUnmount(() => {
 
 .ml-ftube__player {
   position: absolute;
-  left: 2.78%;
-  top: 34.73%;
-  width: 94.38%;
-  height: 28.55%;
   z-index: 8;
-  display: grid;
-  place-items: center;
+  display: block;
   padding: 0;
   box-sizing: border-box;
   overflow: hidden;
@@ -335,9 +353,12 @@ onBeforeUnmount(() => {
 }
 
 .ml-ftube__player-video {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   background: #000;
 }
 </style>

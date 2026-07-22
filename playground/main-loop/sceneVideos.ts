@@ -3,17 +3,17 @@ export type SceneVideoClip =
   | 'phone-start'
   | 'phone-end'
   | 'advisor-signing'
-  | 'intro-intruder';
+  | 'publish-bill-end';
 
 export type SceneBackdropMode =
   | 'idle'
   | 'phone-start'
   | 'phone-hold'
   | 'phone-end'
+  | 'publish-end'
   | 'advisor-arrive'
   | 'advisor-hold'
-  | 'advisor-leave'
-  | 'intro-intruder';
+  | 'advisor-leave';
 
 /** When false, idle mode stays on the static poster (no random ambient clips). */
 export const AMBIENT_IDLE_ENABLED = false;
@@ -34,7 +34,6 @@ const IDLE_FILE_STEMS = [
 ] as const;
 
 const ADVISOR_SIGNING_STEM = 'idle-signing-documents';
-export const INTRO_INTRUDER_STEM = 'idle-homeless-intruder';
 
 function resolveNamedSrc(stem: string): string | null {
   const webm = `./assets/video/${stem}.webm`;
@@ -74,9 +73,6 @@ function resolveClipSrc(clip: SceneVideoClip): string | null {
   if (clip === 'advisor-signing') {
     return resolveNamedSrc(ADVISOR_SIGNING_STEM);
   }
-  if (clip === 'intro-intruder') {
-    return resolveNamedSrc(INTRO_INTRUDER_STEM);
-  }
   return resolveNamedSrc(clip);
 }
 
@@ -110,10 +106,10 @@ export function clipForMode(mode: SceneBackdropMode): SceneVideoClip | null {
   if (mode === 'idle') return 'idle';
   if (mode === 'phone-start' || mode === 'phone-hold') return 'phone-start';
   if (mode === 'phone-end') return 'phone-end';
+  if (mode === 'publish-end') return 'publish-bill-end';
   if (mode === 'advisor-arrive' || mode === 'advisor-hold' || mode === 'advisor-leave') {
     return 'advisor-signing';
   }
-  if (mode === 'intro-intruder') return 'intro-intruder';
   return null;
 }
 

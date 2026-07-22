@@ -23,7 +23,7 @@ const apiRows = [
     <DocsDemoBlock title="基础用法" description="图标在上，中文在中，英文在下。">
       <div class="row">
         <GameFeatureButton icon="action" label="发布行动" subtitle="ACTION" />
-        <GameFeatureButton icon="document" label="处理法案" subtitle="LEGISLATION" />
+        <GameFeatureButton icon="document" label="处理文件" subtitle="LEGISLATION" />
         <GameFeatureButton icon="chart" label="民意调查" subtitle="POLLING" />
       </div>
       <template #code>

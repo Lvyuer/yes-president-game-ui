@@ -21,6 +21,7 @@ function onAction(index: number) {
     class="ml-actions-wrap"
     :class="{
       'is-phone-highlight': props.highlightAction === 'phone',
+      'is-publish-highlight': props.highlightAction === 'publish',
       'is-inbox-highlight': props.highlightAction === 'inbox',
     }"
   >
@@ -103,20 +104,23 @@ function onAction(index: number) {
   opacity: 0.9;
 }
 
-/* phone = 1st, inbox = 3rd — bounce whole button + rounded halo matching frame */
+/* phone = 1st, publish = 2nd, inbox = 3rd — bounce whole button + rounded halo matching frame */
 .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1)),
+.ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2)),
 .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3)) {
   position: relative;
   z-index: 3;
 }
 
 .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button),
+.ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button),
 .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button) {
   animation: ml-dock-bounce 1.05s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
   will-change: transform;
 }
 
 .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button::before),
+.ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button::before),
 .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button::before) {
   content: '';
   position: absolute;
@@ -170,11 +174,13 @@ function onAction(index: number) {
 
 @media (prefers-reduced-motion: reduce) {
   .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button),
+  .ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button),
   .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button) {
     animation: none;
   }
 
   .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button::before),
+  .ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button::before),
   .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button::before) {
     animation: none;
     opacity: 1;

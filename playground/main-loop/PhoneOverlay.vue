@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { APP_MOCKUPS } from './data';
-import type { NegotiationOption } from './casePortStrike';
-import type { PhoneAppId } from './casePortStrike';
+import type { NegotiationOption, FtubeEpisode, AidePhase } from './casePortStrike';
+import type { PhoneAppId, FelegramContactId } from './casePortStrike';
 import FtubeScreen from './FtubeScreen.vue';
 import FelegramChat from './FelegramChat.vue';
 import FSocialPost from './FSocialPost.vue';
@@ -33,7 +33,14 @@ const props = defineProps<{
   initialApp?: PhoneAppId | null;
   appBadges?: Partial<Record<PhoneAppId, boolean>>;
   ftubeWatched?: boolean;
+  ftubeEpisode?: FtubeEpisode;
+  reopenWatched?: boolean;
   dmCompleted?: boolean;
+  aideUnlocked?: boolean;
+  aideBriefingCompleted?: boolean;
+  aidePhase?: AidePhase;
+  felegramReplyCounts?: Partial<Record<FelegramContactId, number>>;
+  aideInvestigationReplyCount?: number;
   tweetPosted?: boolean;
   canClose?: boolean;
   guardForApp?: (app: PhoneAppId) => string | null;
@@ -43,7 +50,10 @@ const emit = defineEmits<{
   close: [];
   closeBlocked: [];
   ftubeWatched: [];
+  reopenWatched: [];
   negotiationComplete: [option: NegotiationOption];
+  aideComplete: [phase: AidePhase];
+  felegramProgress: [payload: { contactId: FelegramContactId; replyCount: number }];
   tweetPosted: [content: string];
   hotSearchSeen: [];
 }>();
@@ -76,6 +86,20 @@ const ftubeRef = ref<{ goBack: () => Promise<boolean> } | null>(null);
 
 const isImmersiveApp = computed(() => activeApp.value !== null);
 const bottomActionLabel = computed(() => (activeApp.value ? '返回' : '关闭'));
+
+const ftubeWatchedForEpisode = computed(() =>
+  props.ftubeEpisode === 'reopen'
+    ? Boolean(props.reopenWatched)
+    : Boolean(props.ftubeWatched),
+);
+
+function onFtubeWatched() {
+  if (props.ftubeEpisode === 'reopen') {
+    emit('reopenWatched');
+  } else {
+    emit('ftubeWatched');
+  }
+}
 
 const showFCompose = ref(true);
 const showFHotsearch = ref(false);
@@ -353,22 +377,30 @@ function onBottomClick() {
             v-if="activeApp === 'ftube'"
             ref="ftubeRef"
             :locked="Boolean(guardMessage('ftube'))"
-            :watched="Boolean(props.ftubeWatched)"
+            :watched="ftubeWatchedForEpisode"
+            :episode="props.ftubeEpisode ?? 'crisis'"
             :interactive="!phoneBooting"
             :guard-message="guardMessage('ftube')"
-            @watched="emit('ftubeWatched')"
+            @watched="onFtubeWatched"
           />
 
           <FelegramChat
-            v-else-if="activeApp === 'felegram'"
+            v-show="activeApp === 'felegram'"
             ref="felegramRef"
             :locked="Boolean(guardMessage('felegram'))"
             :completed="Boolean(props.dmCompleted)"
+            :aide-unlocked="Boolean(props.aideUnlocked)"
+            :aide-briefing-completed="Boolean(props.aideBriefingCompleted)"
+            :aide-phase="props.aidePhase ?? 'briefing'"
+            :reply-counts="props.felegramReplyCounts ?? {}"
+            :aide-investigation-reply-count="props.aideInvestigationReplyCount ?? 0"
             :guard-message="guardMessage('felegram')"
             @complete="emit('negotiationComplete', $event)"
+            @aide-complete="emit('aideComplete', $event)"
+            @progress="emit('felegramProgress', $event)"
           />
 
-          <div v-else-if="activeApp === 'f'" class="ml-phone__stack">
+          <div v-if="activeApp === 'f'" class="ml-phone__stack">
             <div
               v-show="showFCompose"
               ref="fComposeRef"
@@ -390,7 +422,10 @@ function onBottomClick() {
             </div>
           </div>
 
-          <div v-else-if="activeApp" class="ml-phone__placeholder">
+          <div
+            v-else-if="activeApp && activeApp !== 'ftube' && activeApp !== 'felegram'"
+            class="ml-phone__placeholder"
+          >
             <div class="ml-phone__app-view-head">
               <img
                 class="ml-phone__app-view-icon"
@@ -420,6 +455,13 @@ function onBottomClick() {
   z-index: 30;
   display: grid;
   place-items: center;
+  box-sizing: border-box;
+  /* Keep device below top HUD and above bottom dock. */
+  padding:
+    calc(var(--yp-hud-safe-top) + var(--yp-hud-top-time-min-h) + 8px)
+    12px
+    calc(var(--yp-hud-safe-bottom) + var(--yp-hud-dock-btn-min-h) * 0.42)
+    12px;
 }
 
 .ml-phone.is-nav-locked .ml-phone__screen,
@@ -437,7 +479,8 @@ function onBottomClick() {
 
 .ml-phone__device {
   position: relative;
-  width: min(540px, 90vw, calc(92vh * 9 / 16));
+  width: min(480px, 86vw, calc(78vh * 9 / 16));
+  max-height: 100%;
   aspect-ratio: 9 / 16;
   z-index: 1;
   filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55));

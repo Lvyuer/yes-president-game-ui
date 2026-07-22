@@ -389,7 +389,7 @@ async function applyMode(mode: SceneBackdropMode) {
 
   if (!src) {
     hideToPoster(false);
-    if (mode === 'phone-start' || mode === 'phone-end' || mode === 'intro-intruder') {
+    if (mode === 'phone-start' || mode === 'phone-end' || mode === 'publish-end') {
       emit('clipEnded');
     } else if (mode === 'advisor-arrive') {
       emit('clipPaused');
@@ -433,7 +433,12 @@ function onVideoEnded(event: Event) {
     return;
   }
 
-  if (props.mode === 'phone-start' || props.mode === 'phone-end' || props.mode === 'intro-intruder' || props.mode === 'advisor-leave') {
+  if (
+    props.mode === 'phone-start' ||
+    props.mode === 'phone-end' ||
+    props.mode === 'publish-end' ||
+    props.mode === 'advisor-leave'
+  ) {
     video.pause();
     emit('clipEnded');
   }

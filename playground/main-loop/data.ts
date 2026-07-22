@@ -42,17 +42,6 @@ export type InboxItem = {
 
 export const INBOX_ITEMS: InboxItem[] = [
   {
-    id: 'port-comp',
-    title: '港口临时补偿申请',
-    source: '工会领袖',
-    deadline: '3月12日',
-    urgency: 'urgent',
-    urgencyLabel: '紧急',
-    direction: '民生与秩序',
-    summary: '罢工工人要求临时补偿与复工保障，否则将继续封锁港口。',
-    status: 'pending',
-  },
-  {
     id: 'congress-invest',
     title: '国会要求调查调水门',
     source: '自然资源委员会',
@@ -82,19 +71,6 @@ export type NationMetric = {
 export const NATION_GROUP_ORDER = ['治理绩效', '国家能力'] as const;
 
 export const NATION_METRICS: NationMetric[] = [
-  {
-    key: 'support',
-    label: '支持率',
-    value: '44%',
-    delta: '▼ 2.1 / 期',
-    group: '治理绩效',
-    groupEn: 'GOVERNANCE',
-    description: '通过建立和保持主导的地位来推动政策。',
-    defaultView: 'domestic',
-    summary: ['港口州持续承压', '范围：+4', '推进中'],
-    trend: [46, 48, 43, 47, 45, 46, 44],
-    progress: 44,
-  },
   {
     key: 'stability',
     label: '通胀稳定',
@@ -210,12 +186,12 @@ export const RESOURCES = [
   { id: 'prestige', label: '个人威望', value: '67', icon: 'prestige' },
   { id: 'security', label: '安全指数', value: '54', icon: 'security' },
   { id: 'wealth', label: '家族财产', value: '¥ 2.4B', icon: 'wealth' },
-  { id: 'loyalty', label: '派系忠诚', value: '71', icon: 'loyalty' },
+  { id: 'support', label: '支持率', value: '44%', icon: 'support' },
 ];
 
 export const MAIN_ACTIONS = [
   { icon: 'phone', label: '手机', subtitle: 'PHONE', action: 'phone' as const },
   { icon: 'document', label: '发布法案', subtitle: 'CREATE BILL', action: 'publish' as const },
-  { icon: 'gavel', label: '处理法案', subtitle: 'PROCESS BILL', action: 'inbox' as const },
+  { icon: 'gavel', label: '处理文件', subtitle: 'PROCESS FILES', action: 'inbox' as const },
   { icon: 'nation', label: '国家数据', subtitle: 'NATIONAL DATA', action: 'nation' as const },
 ];

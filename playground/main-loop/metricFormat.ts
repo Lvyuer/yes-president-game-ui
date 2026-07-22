@@ -8,12 +8,15 @@ export function formatResourceValue(id: string, num: number): string {
   if (id === 'wealth') {
     return `¥ ${(num / 1e9).toFixed(1)}B`;
   }
+  if (id === 'support') {
+    return `${Math.round(num)}%`;
+  }
   return String(Math.round(num));
 }
 
 export function formatNationValue(key: string, num: number): string {
-  if (key === 'support' || key === 'cpi') {
-    return `${num.toFixed(key === 'cpi' ? 1 : 0)}%`;
+  if (key === 'cpi') {
+    return `${num.toFixed(1)}%`;
   }
   return String(Math.round(num));
 }

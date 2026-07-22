@@ -5,7 +5,7 @@ import DocsApiTable from '../components/DocsApiTable.vue';
 import { ActionGrid } from '@/index';
 
 const items = [
-  { icon: 'document', label: '处理法案', subtitle: 'LEGISLATION' },
+  { icon: 'document', label: '处理文件', subtitle: 'LEGISLATION' },
   { icon: 'chart', label: '民意调查', subtitle: 'POLLING' },
   { icon: 'action', label: '发布行动', subtitle: 'ACTION' },
   { icon: 'play', label: '推进回合', subtitle: 'ADVANCE' },
@@ -29,7 +29,7 @@ const apiRows = [
       <ActionGrid :items="items" />
       <template #code>
 {{ `<ActionGrid :items="[
-  { icon: 'document', label: '处理法案', subtitle: 'LEGISLATION' },
+  { icon: 'document', label: '处理文件', subtitle: 'LEGISLATION' },
   { icon: 'chart', label: '民意调查', subtitle: 'POLLING' },
   { icon: 'action', label: '发布行动', subtitle: 'ACTION' },
   { icon: 'play', label: '推进回合', subtitle: 'ADVANCE' },

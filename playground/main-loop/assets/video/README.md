@@ -6,7 +6,9 @@
 |---|---|
 | `idle-*.mp4` | 主界面 ambient 随机插播（**当前关闭**：`AMBIENT_IDLE_ENABLED = false`）；平时用静图 IDLE |
 | `idle-signing-documents.mp4` | **港口罢工案例专用**：幕僚呈递→定格→退场（`advisor-arrive/hold/leave`） |
-| `idle-homeless-intruder.mp4` | **开场专用**：进主循环约 2s 后播放；播完才推危机（`intro-intruder`） |
+| `publish-bill-end.mp4` | 颁布法案成功后的收束镜头（`publish-end`） |
+| `ftube-port-strike.mp4` | FTube 危机现场（罢工） |
+| `ftube-port-reopen.mp4` | FTube 复工现场（签署后第二集） |
 | `idle.webm` / `idle.mp4` | 可选单条 ambient（与 `idle-*` 一并纳入随机池） |
 | `phone-start.webm` | 点击手机：掏手机过渡（约 4s，首帧对齐 IDLE） |
 | `phone-end.webm` | 关闭手机：收手机过渡（约 4s，尾帧对齐 IDLE） |

@@ -35,7 +35,7 @@ function onOpen() {
           <p class="ml-advisor-cue__message">{{ props.message }}</p>
           <p v-if="props.subline" class="ml-advisor-cue__meta">{{ props.subline }}</p>
           <div class="ml-advisor-cue__footer">
-            <span class="ml-advisor-cue__cta">{{ props.cta ?? '打开处理法案' }}</span>
+            <span class="ml-advisor-cue__cta">{{ props.cta ?? '打开处理文件' }}</span>
             <span class="ml-advisor-cue__arrow" aria-hidden="true">→</span>
           </div>
         </div>

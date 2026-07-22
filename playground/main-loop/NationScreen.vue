@@ -13,7 +13,7 @@ const emit = defineEmits<{
   back: [];
 }>();
 
-const metricKey = ref('support');
+const metricKey = ref('stability');
 const view = ref<'domestic' | 'network' | 'trend'>('domestic');
 
 const flatMetrics = computed(() => props.metrics ?? NATION_METRICS);
