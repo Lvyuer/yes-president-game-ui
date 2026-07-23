@@ -8,7 +8,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 ICON_DIR = ROOT / "src" / "assets" / "themes" / "default" / "icons"
 BACKUP_DIR = ROOT / "src" / "assets" / "raw" / "icon-recrop-backups"
-NAMES = ("prestige", "security", "wealth", "loyalty")
+NAMES = ("prestige", "security", "wealth", "support")
 
 
 def content_mask(im: Image.Image):

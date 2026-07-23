@@ -58,37 +58,38 @@ const STEP_RANGES: Array<Array<[number, number]>> = [
 
 /**
  * Action-bar number slots measured against f-hotsearch-ui-base.png (1440×2560).
+ * left = just right of reply/repost/like/views icons; top = icon vertical center.
  */
 const SLOTS: Array<Array<{ left: string; top: string }>> = [
   [
-    { left: '32.4%', top: '29.9%' },
-    { left: '46.4%', top: '29.9%' },
-    { left: '61.0%', top: '29.9%' },
-    { left: '74.4%', top: '29.9%' },
+    { left: '31.5%', top: '27.9%' },
+    { left: '48.7%', top: '27.9%' },
+    { left: '65.7%', top: '27.9%' },
+    { left: '81.6%', top: '27.9%' },
   ],
   [
-    { left: '32.4%', top: '46.9%' },
-    { left: '46.4%', top: '46.9%' },
-    { left: '61.0%', top: '46.9%' },
-    { left: '74.4%', top: '46.9%' },
+    { left: '31.5%', top: '46.5%' },
+    { left: '48.7%', top: '46.5%' },
+    { left: '65.7%', top: '46.5%' },
+    { left: '81.6%', top: '46.5%' },
   ],
   [
-    { left: '32.4%', top: '63.9%' },
-    { left: '46.4%', top: '63.9%' },
-    { left: '61.0%', top: '63.9%' },
-    { left: '74.4%', top: '63.9%' },
+    { left: '31.5%', top: '65.0%' },
+    { left: '48.7%', top: '65.0%' },
+    { left: '65.7%', top: '65.0%' },
+    { left: '81.6%', top: '65.0%' },
   ],
   [
-    { left: '32.4%', top: '81.0%' },
-    { left: '46.4%', top: '81.0%' },
-    { left: '61.0%', top: '81.0%' },
-    { left: '74.4%', top: '81.0%' },
+    { left: '31.5%', top: '83.6%' },
+    { left: '48.7%', top: '83.6%' },
+    { left: '65.7%', top: '83.6%' },
+    { left: '81.6%', top: '83.6%' },
   ],
   [
-    { left: '32.4%', top: '98.0%' },
-    { left: '46.4%', top: '98.0%' },
-    { left: '61.0%', top: '98.0%' },
-    { left: '74.4%', top: '98.0%' },
+    { left: '31.5%', top: '95.8%' },
+    { left: '48.7%', top: '95.8%' },
+    { left: '65.7%', top: '95.8%' },
+    { left: '81.6%', top: '95.8%' },
   ],
 ];
 
@@ -191,7 +192,7 @@ onUnmounted(() => {
   z-index: 2;
   transform: translateY(-50%);
   font-family: var(--yp-font-sans);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-variant-numeric: tabular-nums;
   font-weight: 400;
   letter-spacing: 0;
@@ -202,7 +203,7 @@ onUnmounted(() => {
 
 /* Lead post: quieter emphasis — brighter text + weight, no glow */
 .ml-hotsearch__count.is-lead {
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 700;
   color: #e7e9ea;
 }

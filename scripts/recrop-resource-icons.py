@@ -5,7 +5,7 @@ import numpy as np
 BASE = r"C:\Users\zijenzhou\Documents\yes president\packages\yes-president-game-ui"
 BACKUP_DIR = os.path.join(BASE, "src", "assets", "raw", "icon-recrop-backups")
 OUT_DIR = os.path.join(BASE, "src", "assets", "themes", "default", "icons")
-NAMES = ["prestige", "security", "wealth", "loyalty"]
+NAMES = ["prestige", "security", "wealth", "support"]
 
 PAD = 12
 MERGE_GAP = 6

@@ -137,10 +137,10 @@ onBeforeUnmount(() => {
 
 .ml-fsocial__editor {
   position: absolute;
-  left: 14%;
-  top: 9.8%;
-  width: 78%;
-  height: 9.2%;
+  left: 16%;
+  top: 9.2%;
+  width: 76%;
+  height: 4.6%;
   z-index: 2;
   box-sizing: border-box;
   padding: 4px 6px;
@@ -168,9 +168,9 @@ onBeforeUnmount(() => {
 
 .ml-fsocial__post-hit {
   position: absolute;
-  left: 81.2%;
-  top: 20.2%;
-  width: 11.3%;
+  left: 82%;
+  top: 17.85%;
+  width: 11.5%;
   height: 3.1%;
   z-index: 3;
   padding: 0;

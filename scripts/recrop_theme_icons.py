@@ -10,7 +10,7 @@ import numpy as np
 
 ICONS_DIR = Path(r"packages/yes-president-game-ui/src/assets/themes/default/icons")
 BACKUP_DIR = Path(r"packages/yes-president-game-ui/src/assets/raw/icon-recrop-backups")
-NAMES = ["prestige.png", "security.png", "wealth.png", "loyalty.png"]
+NAMES = ["prestige.png", "security.png", "wealth.png", "support.png"]
 
 COL_THRESHOLD = 3
 PADDING = 8

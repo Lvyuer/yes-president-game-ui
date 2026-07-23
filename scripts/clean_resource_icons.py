@@ -7,7 +7,7 @@ from pathlib import Path
 
 from PIL import Image
 
-ICONS = ("prestige", "security", "wealth", "loyalty")
+ICONS = ("prestige", "security", "wealth", "support")
 ICONS_DIR = Path(__file__).resolve().parent.parent / "src/assets/themes/default/icons"
 
 

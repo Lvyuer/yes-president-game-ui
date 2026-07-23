@@ -323,10 +323,11 @@ async function sendMessage() {
     thread.replyCount,
   );
 
+  // Demo: any non-empty input advances the script; bubble always shows the preset line.
   thread.messages.push({
     id: nextId('me'),
     role: 'me',
-    text,
+    text: player,
   });
   thread.waiting = true;
   await nextTick();
