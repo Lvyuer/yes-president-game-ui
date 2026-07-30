@@ -112,7 +112,11 @@
   --yp-radius-sm: 4px;
   --yp-radius-md: 8px;
 
-  /* Main-loop HUD layout (see src/docs/HUD_LAYOUT.md) */
+  /* Main-loop HUD layout (see src/docs/HUD_LAYOUT.md)
+   * Design sizes assume 1080px stage height. .ml-shell__stage sets --yp-hud-scale
+   * and re-declares these tokens so they recompute (CSS vars do not re-resolve if
+   * only defined on :root with calc(scale)). */
+  --yp-hud-scale: 1;
   --yp-hud-aspect: 16 / 9;
   --yp-hud-stage-pad: 16px;
   --yp-hud-safe-x: 18px;
@@ -131,6 +135,20 @@
   --yp-hud-dock-btn-min-h: 176px;
   --yp-hud-dock-pad-top: 6px;
   --yp-hud-dock-fade: linear-gradient(0deg, rgba(0, 0, 0, 0.55), transparent);
+
+  --yp-hud-resource-icon: 96px;
+  --yp-hud-dock-icon: 88px;
+  --yp-hud-font-resource-label: 1.35rem;
+  --yp-hud-font-resource-value: 2.35rem;
+  --yp-hud-font-resource-value-roll: 1.95rem;
+  --yp-hud-font-term: 1.65rem;
+  --yp-hud-font-midterm: 1rem;
+  --yp-hud-font-dock-label: 1.35rem;
+  --yp-hud-font-dock-sub: 0.85rem;
+  --yp-hud-dock-btn-pad-y: 22px;
+  --yp-hud-dock-btn-pad-x: 14px;
+  --yp-hud-dock-btn-pad-bottom: 18px;
+  --yp-hud-progress-track-h: 8px;
 
   /* Documented breakpoint; media queries must use literal 900px */
   --yp-hud-break-narrow: 900px;

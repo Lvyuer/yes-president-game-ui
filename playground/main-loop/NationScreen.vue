@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { GameButton } from '@/index';
-import { NATION_METRICS, type NationMetric } from './data';
+import { NATION_GROUP_ORDER, NATION_METRICS, type NationMetric } from './data';
 import nationBase from './assets/nation-ui-base.png';
 
 const props = defineProps<{
@@ -13,7 +13,7 @@ const emit = defineEmits<{
   back: [];
 }>();
 
-const metricKey = ref('stability');
+const metricKey = ref('gdp');
 const view = ref<'domestic' | 'network' | 'trend'>('domestic');
 
 const flatMetrics = computed(() => props.metrics ?? NATION_METRICS);
@@ -53,7 +53,7 @@ const viewTabs = [
   { id: 'trend' as const, label: '趋势' },
 ];
 
-/** Tops measured from nation-ui-base.png metric slots (v2) */
+/** Tops measured from nation-ui-base.png metric slots (v2) — six secondary metrics */
 const METRIC_TOPS = [
   '15.74%',
   '27.22%',
@@ -61,7 +61,6 @@ const METRIC_TOPS = [
   '49.35%',
   '60.42%',
   '71.44%',
-  '82.55%',
 ] as const;
 </script>
 
@@ -82,8 +81,8 @@ const METRIC_TOPS = [
       </div>
     </header>
 
-    <p class="ml-nation__group ml-nation__group--gov">治理绩效</p>
-    <p class="ml-nation__group ml-nation__group--power">国家能力</p>
+    <p class="ml-nation__group ml-nation__group--macro">{{ NATION_GROUP_ORDER[0] }}</p>
+    <p class="ml-nation__group ml-nation__group--route">{{ NATION_GROUP_ORDER[1] }}</p>
 
     <button
       v-for="(item, index) in flatMetrics"
@@ -274,11 +273,11 @@ const METRIC_TOPS = [
   letter-spacing: 0.04em;
 }
 
-.ml-nation__group--gov {
+.ml-nation__group--macro {
   top: 11.8%;
 }
 
-.ml-nation__group--power {
+.ml-nation__group--route {
   top: 48.2%;
 }
 

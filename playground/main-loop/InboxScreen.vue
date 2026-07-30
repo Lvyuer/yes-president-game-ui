@@ -11,6 +11,8 @@ const props = defineProps<{
   highlightBillIds?: string[];
   /** Already signed bill ids — shown grayed at the bottom of the list. */
   signedBillIds?: string[];
+  /** When set, only these inbox item ids are shown (week-loop campaign filtering). */
+  visibleItemIds?: string[];
   itemGuard?: (id: string) => string | null;
 }>();
 
@@ -32,8 +34,11 @@ function buildItems(signedIds: string[] | undefined, previous: InboxItem[] = [])
 const items = ref<InboxItem[]>(buildItems(props.signedBillIds));
 
 const sortedItems = computed(() => {
-  const pending = items.value.filter((item) => item.status === 'pending');
-  const done = items.value.filter((item) => item.status === 'done');
+  const visible = props.visibleItemIds
+    ? items.value.filter((item) => props.visibleItemIds!.includes(item.id))
+    : items.value;
+  const pending = visible.filter((item) => item.status === 'pending');
+  const done = visible.filter((item) => item.status === 'done');
   return [...pending, ...done];
 });
 

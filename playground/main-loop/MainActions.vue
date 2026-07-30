@@ -1,31 +1,86 @@
 <script setup lang="ts">
-import { ActionGrid } from '@/index';
-import { MAIN_ACTIONS } from './data';
+import briefingIcon from './assets/briefing-icon.png';
+import phoneIcon from './assets/dock-phone.png';
+import publishIcon from './assets/dock-publish.png';
+import inboxIcon from './assets/dock-inbox.png';
+import nationIcon from './assets/dock-nation.png';
+
+type DockActionId = 'phone' | 'publish' | 'inbox' | 'nation';
+
+const DOCK_ACTIONS: {
+  id: DockActionId;
+  label: string;
+  subtitle: string;
+  icon: string;
+}[] = [
+  { id: 'phone', label: '手机', subtitle: 'PHONE', icon: phoneIcon },
+  { id: 'publish', label: '发布法案', subtitle: 'CREATE BILL', icon: publishIcon },
+  { id: 'inbox', label: '处理文件', subtitle: 'PROCESS FILES', icon: inboxIcon },
+  { id: 'nation', label: '国家数据', subtitle: 'NATIONAL DATA', icon: nationIcon },
+];
 
 const props = defineProps<{
-  highlightAction?: 'phone' | 'publish' | 'inbox' | 'nation';
+  highlightAction?: DockActionId;
+  /** 周循环自由行动：显示翻阅入口「本周要情」 */
+  showDossier?: boolean;
+  /** 议题板 NEW 数量角标 */
+  dossierNewCount?: number;
 }>();
 
 const emit = defineEmits<{
-  action: [id: 'phone' | 'publish' | 'inbox' | 'nation'];
+  action: [id: DockActionId];
+  openDossier: [];
 }>();
-
-function onAction(index: number) {
-  const item = MAIN_ACTIONS[index];
-  if (item) emit('action', item.action);
-}
 </script>
 
 <template>
   <div
     class="ml-actions-wrap"
     :class="{
-      'is-phone-highlight': props.highlightAction === 'phone',
-      'is-publish-highlight': props.highlightAction === 'publish',
-      'is-inbox-highlight': props.highlightAction === 'inbox',
+      'has-dossier': props.showDossier,
     }"
   >
-    <ActionGrid class="ml-actions" :items="MAIN_ACTIONS" @action="onAction" />
+    <div class="ml-actions-row">
+      <div v-if="props.showDossier" class="ml-prop-slot">
+        <button
+          type="button"
+          class="ml-prop-btn"
+          aria-label="本周要情，BRIEFING"
+          @click="emit('openDossier')"
+        >
+          <img class="ml-prop-btn__art" :src="briefingIcon" alt="" />
+          <span class="ml-prop-btn__label">本周要情</span>
+          <span class="ml-prop-btn__sub">BRIEFING</span>
+        </button>
+        <span
+          v-if="(props.dossierNewCount ?? 0) > 0"
+          class="ml-prop-badge"
+          aria-hidden="true"
+        >
+          {{ props.dossierNewCount }}
+        </span>
+      </div>
+
+      <div v-if="props.showDossier" class="ml-prop-sep" aria-hidden="true" />
+
+      <div
+        v-for="item in DOCK_ACTIONS"
+        :key="item.id"
+        class="ml-prop-slot"
+        :class="{ 'is-highlight': props.highlightAction === item.id }"
+      >
+        <button
+          type="button"
+          class="ml-prop-btn"
+          :aria-label="`${item.label}，${item.subtitle}`"
+          @click="emit('action', item.id)"
+        >
+          <img class="ml-prop-btn__art" :src="item.icon" alt="" />
+          <span class="ml-prop-btn__label">{{ item.label }}</span>
+          <span class="ml-prop-btn__sub">{{ item.subtitle }}</span>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -36,105 +91,141 @@ function onAction(index: number) {
   width: 100%;
 }
 
-.ml-actions {
-  width: min(var(--yp-hud-dock-max-w), var(--yp-hud-dock-w));
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--yp-hud-dock-gap);
-  overflow: visible;
-}
-
-.ml-actions :deep(.yp-action-grid),
-.ml-actions :deep(.yp-action-grid > *) {
-  overflow: visible;
-}
-
-.ml-actions :deep(.yp-feature-button) {
-  min-width: 0;
-  min-height: var(--yp-hud-dock-btn-min-h);
-  width: 100%;
-  color: var(--yp-color-text-main);
-}
-
-.ml-actions :deep(.yp-feature-button__inner) {
-  padding: 22px 14px 18px;
-  gap: 8px;
-  overflow: visible;
-}
-
-.ml-actions :deep(.yp-feature-button__icon) {
+.ml-actions-row {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  flex: 0 0 auto;
-  width: 88px;
-  height: 88px;
-  opacity: 0.95;
-  filter: sepia(0.2) saturate(0.9) brightness(1.05);
+  gap: calc(8px * var(--yp-hud-scale, 1));
+  width: min(1240px, 97%);
 }
 
-.ml-actions :deep(.yp-feature-button__icon img) {
+.ml-actions-wrap:not(.has-dossier) .ml-actions-row {
+  width: min(1020px, 94%);
+}
+
+.ml-prop-slot {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 200px;
+  align-self: stretch;
+}
+
+.ml-prop-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  min-height: calc(var(--yp-hud-dock-btn-min-h) * 1.12);
+  margin: 0;
+  padding: 2px 4px 6px;
+  border: 0;
+  background: transparent;
+  color: var(--yp-color-text-main);
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.ml-prop-btn:hover {
+  transform: translateY(-4px);
+}
+
+.ml-prop-btn:hover .ml-prop-btn__art {
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45))
+    drop-shadow(0 0 10px rgba(215, 188, 126, 0.28));
+}
+
+.ml-prop-btn__art {
   display: block;
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(var(--yp-hud-dock-btn-min-h) * 1.12);
   object-fit: contain;
-  object-position: center;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.4));
+  transition: filter 0.18s ease;
+  pointer-events: none;
+  user-select: none;
 }
 
-.ml-actions :deep(.yp-feature-button__label) {
-  flex: 0 0 auto;
+.ml-prop-btn__label {
   font-family: var(--yp-font-serif);
-  font-size: 1.35rem;
+  font-size: var(--yp-hud-font-dock-label);
   font-weight: 700;
   letter-spacing: 0.08em;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--yp-color-text-main);
   text-shadow: var(--yp-text-glow);
+  white-space: nowrap;
 }
 
-.ml-actions :deep(.yp-feature-button__subtitle) {
-  flex: 0 0 auto;
-  margin-top: 0;
+.ml-prop-btn__sub {
   font-family: var(--yp-font-latin);
-  font-size: 0.85rem;
-  letter-spacing: 0.14em;
+  font-size: var(--yp-hud-font-dock-sub);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--yp-color-gold-bright);
   opacity: 0.9;
+  white-space: nowrap;
 }
 
-/* phone = 1st, publish = 2nd, inbox = 3rd — bounce whole button + rounded halo matching frame */
-.ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1)),
-.ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2)),
-.ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3)) {
-  position: relative;
+.ml-prop-badge {
+  position: absolute;
+  top: 4px;
+  right: 12%;
+  z-index: 2;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 180, 96, 0.55);
+  background: rgba(168, 72, 56, 0.82);
+  font-family: var(--yp-font-latin);
+  font-size: 0.68rem;
+  line-height: 16px;
+  text-align: center;
+  color: #f6e2b8;
+  pointer-events: none;
+}
+
+.ml-prop-sep {
+  flex: 0 0 2px;
+  align-self: stretch;
+  margin: calc(10px * var(--yp-hud-scale, 1)) 4px;
+  border-radius: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(215, 188, 126, 0.35) 12%,
+    rgba(232, 210, 150, 0.85) 50%,
+    rgba(215, 188, 126, 0.35) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px rgba(184, 149, 98, 0.28);
+}
+
+.ml-prop-slot.is-highlight {
   z-index: 3;
 }
 
-.ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button),
-.ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button),
-.ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button) {
+.ml-prop-slot.is-highlight .ml-prop-btn {
   animation: ml-dock-bounce 1.05s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
   will-change: transform;
 }
 
-.ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button::before),
-.ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button::before),
-.ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button::before) {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  z-index: 4;
-  border-radius: calc(var(--yp-frame-button-radius) + 5px);
-  border: 2px solid rgba(232, 205, 140, 0.95);
-  background: rgba(184, 149, 98, 0.14);
-  box-shadow:
-    0 0 0 3px rgba(215, 188, 126, 0.22),
-    0 0 22px rgba(215, 188, 126, 0.55),
-    inset 0 0 18px rgba(215, 188, 126, 0.18);
-  pointer-events: none;
-  animation: ml-dock-halo 1.05s ease-in-out infinite;
+/* drop-shadow 跟 PNG 透明边缘走，描在手机/道具轮廓上，而不是外接方框 */
+.ml-prop-slot.is-highlight .ml-prop-btn__art {
+  filter:
+    drop-shadow(0 0 0.75px rgba(246, 226, 184, 1))
+    drop-shadow(0 0 1.5px rgba(232, 205, 140, 1))
+    drop-shadow(0 0 4px rgba(232, 205, 140, 0.95))
+    drop-shadow(0 0 10px rgba(215, 188, 126, 0.65))
+    drop-shadow(0 8px 14px rgba(0, 0, 0, 0.4));
+  animation: ml-dock-art-glow 1.05s ease-in-out infinite;
 }
 
 @keyframes ml-dock-bounce {
@@ -154,43 +245,56 @@ function onAction(index: number) {
   62% {
     transform: translateY(0) scale(1);
   }
-  /* hold so the jump reads clearly between cycles */
   100% {
     transform: translateY(0) scale(1);
   }
 }
 
-@keyframes ml-dock-halo {
+@keyframes ml-dock-art-glow {
   0%,
   100% {
-    opacity: 0.75;
-    transform: scale(1);
+    filter:
+      drop-shadow(0 0 0.75px rgba(246, 226, 184, 0.85))
+      drop-shadow(0 0 1.5px rgba(232, 205, 140, 0.9))
+      drop-shadow(0 0 4px rgba(232, 205, 140, 0.7))
+      drop-shadow(0 0 10px rgba(215, 188, 126, 0.4))
+      drop-shadow(0 8px 14px rgba(0, 0, 0, 0.4));
   }
   50% {
-    opacity: 1;
-    transform: scale(1.03);
+    filter:
+      drop-shadow(0 0 1px rgba(246, 226, 184, 1))
+      drop-shadow(0 0 2px rgba(232, 205, 140, 1))
+      drop-shadow(0 0 6px rgba(232, 205, 140, 1))
+      drop-shadow(0 0 14px rgba(215, 188, 126, 0.85))
+      drop-shadow(0 8px 14px rgba(0, 0, 0, 0.4));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button),
-  .ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button),
-  .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button) {
-    animation: none;
+  .ml-prop-btn,
+  .ml-prop-btn__art {
+    transition: none;
   }
 
-  .ml-actions-wrap.is-phone-highlight :deep(.yp-action-grid > :nth-child(1) .yp-feature-button::before),
-  .ml-actions-wrap.is-publish-highlight :deep(.yp-action-grid > :nth-child(2) .yp-feature-button::before),
-  .ml-actions-wrap.is-inbox-highlight :deep(.yp-action-grid > :nth-child(3) .yp-feature-button::before) {
+  .ml-prop-slot.is-highlight .ml-prop-btn,
+  .ml-prop-slot.is-highlight .ml-prop-btn__art {
     animation: none;
-    opacity: 1;
   }
 }
 
 @media (max-width: 900px) {
-  .ml-actions {
+  .ml-actions-row {
+    flex-wrap: wrap;
     width: min(420px, 92%);
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ml-prop-slot {
+    flex: 1 1 calc(50% - 8px);
+    max-width: none;
+  }
+
+  .ml-prop-sep {
+    display: none;
   }
 }
 </style>

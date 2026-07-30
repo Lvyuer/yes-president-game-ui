@@ -22,6 +22,9 @@ const iconMap: Record<string, string> = {
   phone: phoneIcon,
   play: playIcon,
   prestige: prestigeIcon,
+  personal_safety: securityIcon,
+  public_order: nationIcon,
+  dynasty_wealth: wealthIcon,
   security: securityIcon,
   wealth: wealthIcon,
 };

@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GameButton, GameNotice } from '@/index';
-import {
-  formatCrisisImpactHint,
-  type CrisisImpactHint,
-} from './casePortStrike';
+import { GameButton, GameNotice, resolveGameIcon } from '@/index';
+import { type CrisisImpactHint } from './casePortStrike';
+import { iconForMetricLabel } from './metricFormat';
 
 const props = withDefaults(
   defineProps<{
@@ -17,7 +15,7 @@ const props = withDefaults(
     cta?: string;
   }>(),
   {
-    noticeTitle: '危机推送',
+    noticeTitle: '突发事件',
     cta: '查看现场',
     hints: () => [],
   },
@@ -29,10 +27,15 @@ const emit = defineEmits<{
 }>();
 
 const chips = computed(() =>
-  props.hints.map((hint) => ({
-    ...hint,
-    formatted: formatCrisisImpactHint(hint),
-  })),
+  props.hints.map((hint) => {
+    const icon = iconForMetricLabel(hint.label);
+    const arrow = hint.direction === 'down' ? '↓' : '↑';
+    return {
+      ...hint,
+      arrow,
+      iconSrc: resolveGameIcon(icon),
+    };
+  }),
 );
 
 function continueCrisis() {
@@ -47,7 +50,7 @@ function continueCrisis() {
       v-if="props.open"
       class="ml-crisis-impact"
       role="dialog"
-      aria-label="危机推送"
+      aria-label="突发事件"
     >
       <button
         type="button"
@@ -65,7 +68,7 @@ function continueCrisis() {
             <div
               v-if="chips.length"
               class="ml-crisis-impact__chips"
-              aria-label="资源变化"
+              aria-label="可能的数值变化"
             >
               <span
                 v-for="chip in chips"
@@ -73,7 +76,16 @@ function continueCrisis() {
                 class="ml-crisis-impact__chip"
                 :class="`is-${chip.direction}`"
               >
-                {{ chip.formatted }}
+                <img
+                  v-if="chip.iconSrc"
+                  class="ml-crisis-impact__chip-icon"
+                  :src="chip.iconSrc"
+                  alt=""
+                />
+                <span>{{ chip.label }}</span>
+                <span class="ml-crisis-impact__chip-arrow" aria-hidden="true">{{
+                  chip.arrow
+                }}</span>
               </span>
             </div>
 
@@ -126,11 +138,11 @@ function continueCrisis() {
 
 .ml-crisis-impact__card :deep(.yp-notice__title) {
   margin: 0 0 10px;
-  font-family: var(--yp-font-latin);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--yp-font-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: none;
   color: #f0b0b0;
 }
 
@@ -173,14 +185,30 @@ function continueCrisis() {
 }
 
 .ml-crisis-impact__chip {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px 5px 6px;
   border-radius: 999px;
   border: 1px solid rgba(184, 149, 98, 0.35);
   background: rgba(0, 0, 0, 0.28);
-  font-family: var(--yp-font-data);
-  font-size: 0.92rem;
+  font-family: var(--yp-font-serif);
+  font-size: 0.84rem;
+  line-height: 1.2;
   letter-spacing: 0.02em;
   color: var(--yp-color-text-muted);
+}
+
+.ml-crisis-impact__chip-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.ml-crisis-impact__chip-arrow {
+  font-family: var(--yp-font-data);
+  font-size: 0.9rem;
 }
 
 .ml-crisis-impact__chip.is-up {

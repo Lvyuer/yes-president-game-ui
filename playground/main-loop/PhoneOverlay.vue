@@ -1,12 +1,23 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import { APP_MOCKUPS } from './data';
-import type { NegotiationOption, FtubeEpisode, AidePhase } from './casePortStrike';
-import type { PhoneAppId, FelegramContactId } from './casePortStrike';
+import type {
+  NegotiationOption,
+  FtubeEpisode,
+  AidePhase,
+  PhoneAppId,
+  FelegramContactId,
+  FelegramFamilyGroupState,
+  FelegramGroupId,
+  FelegramThreadId,
+  FelegramThreadSnapshot,
+} from './casePortStrike';
 import FtubeScreen from './FtubeScreen.vue';
 import FelegramChat from './FelegramChat.vue';
-import FSocialPost from './FSocialPost.vue';
-import FHotSearch from './FHotSearch.vue';
+import FApp from './FApp.vue';
+import GreenhoodScreen from './GreenhoodScreen.vue';
+import type { GreenhoodStore } from './useGreenhood';
+import type { GreenhoodSymbolId } from './greenhoodMarket';
 import phoneBase from './assets/phone-ui-base.png';
 import iconFelegram from './assets/app-felegram.png';
 import iconGreenhood from './assets/app-greenhood.png';
@@ -21,12 +32,9 @@ import {
   playLaunchApp,
   playPhoneClose,
   playPhoneOpen,
-  playPush,
   playShake,
 } from './phoneMotion';
 import gsap from 'gsap';
-
-type FAppView = 'compose' | 'hotsearch';
 
 const props = defineProps<{
   open: boolean;
@@ -39,11 +47,24 @@ const props = defineProps<{
   aideUnlocked?: boolean;
   aideBriefingCompleted?: boolean;
   aidePhase?: AidePhase;
-  felegramReplyCounts?: Partial<Record<FelegramContactId, number>>;
-  aideInvestigationReplyCount?: number;
+  felegramThreads?: Record<FelegramThreadId, FelegramThreadSnapshot>;
+  familyGroup?: FelegramFamilyGroupState;
+  familyTechTipRaised?: boolean;
   tweetPosted?: boolean;
   canClose?: boolean;
   guardForApp?: (app: PhoneAppId) => string | null;
+  hiddenContactIds?: FelegramContactId[];
+  contactOutcomeOverrides?: Partial<Record<FelegramContactId, string>>;
+  aideActOverride?: import('./casePortStrike').FelegramAideAct | null;
+  contactScriptOverrides?: Partial<
+    Record<FelegramContactId, import('./casePortStrike').FelegramContactScript>
+  >;
+  greenhoodStore?: GreenhoodStore;
+  chipPostAvailable?: boolean;
+  chipPosted?: boolean;
+  /** 调水门等脚本帖一键填写 */
+  autofillPostText?: string;
+  initialFelegramThread?: FelegramThreadId | null;
 }>();
 
 const emit = defineEmits<{
@@ -53,9 +74,20 @@ const emit = defineEmits<{
   reopenWatched: [];
   negotiationComplete: [option: NegotiationOption];
   aideComplete: [phase: AidePhase];
-  felegramProgress: [payload: { contactId: FelegramContactId; replyCount: number }];
+  felegramThreadUpdate: [
+    payload: { threadId: FelegramThreadId; snapshot: FelegramThreadSnapshot },
+  ];
+  inviteFamilyMembers: [contactIds: FelegramContactId[]];
+  groupBeat: [payload: { groupId: FelegramGroupId; beatIndex: number }];
+  greenhoodBuy: [symbolId: GreenhoodSymbolId];
+  greenhoodSell: [symbolId: GreenhoodSymbolId];
+  greenhoodRefresh: [symbolId: GreenhoodSymbolId];
   tweetPosted: [content: string];
+  chipPost: [content: string];
+  familyOpen: [];
   hotSearchSeen: [];
+  felegramThreadFocus: [threadId: FelegramThreadId | null];
+  felegramThreadNavigated: [];
 }>();
 
 const APP_ICONS: Record<PhoneAppId, string> = {
@@ -70,7 +102,6 @@ const navLocked = ref(false);
 /** True while phone overlay is mounting / playing open intro — blocks deep-link races. */
 const phoneBooting = ref(false);
 const activeApp = ref<PhoneAppId | null>(null);
-const fView = ref<FAppView>('compose');
 const showHomeLayer = ref(true);
 const showAppLayer = ref(false);
 
@@ -79,18 +110,33 @@ const backdropRef = ref<HTMLButtonElement | null>(null);
 const deviceRef = ref<HTMLElement | null>(null);
 const homeRef = ref<HTMLElement | null>(null);
 const appRef = ref<HTMLElement | null>(null);
-const fComposeRef = ref<HTMLElement | null>(null);
-const fHotsearchRef = ref<HTMLElement | null>(null);
-const felegramRef = ref<{ goBack: () => Promise<boolean> } | null>(null);
+const felegramRef = ref<{
+  goBack: () => Promise<boolean>;
+  openFamilyGroup: () => Promise<void>;
+  openThread: (threadId: FelegramThreadId) => Promise<void>;
+  isFamilyChatOpen: () => boolean;
+  isThreadOpen: (threadId: FelegramThreadId) => boolean;
+} | null>(null);
 const ftubeRef = ref<{ goBack: () => Promise<boolean> } | null>(null);
 
 const isImmersiveApp = computed(() => activeApp.value !== null);
 const bottomActionLabel = computed(() => (activeApp.value ? '返回' : '关闭'));
 
-const ftubeWatchedForEpisode = computed(() =>
-  props.ftubeEpisode === 'reopen'
-    ? Boolean(props.reopenWatched)
-    : Boolean(props.ftubeWatched),
+async function navigateFelegramThread(threadId: FelegramThreadId) {
+  if (activeApp.value !== 'felegram') {
+    await openApp('felegram');
+  }
+  await nextTick();
+  await felegramRef.value?.openThread(threadId);
+  emit('felegramThreadNavigated');
+}
+
+watch(
+  () => [props.open, props.initialFelegramThread, phoneBooting.value] as const,
+  async ([isOpen, threadId, booting]) => {
+    if (!isOpen || booting || !threadId) return;
+    await runNav(() => navigateFelegramThread(threadId));
+  },
 );
 
 function onFtubeWatched() {
@@ -99,16 +145,6 @@ function onFtubeWatched() {
   } else {
     emit('ftubeWatched');
   }
-}
-
-const showFCompose = ref(true);
-const showFHotsearch = ref(false);
-
-function syncFView() {
-  const target = props.tweetPosted ? 'hotsearch' : 'compose';
-  fView.value = target;
-  showFCompose.value = target === 'compose';
-  showFHotsearch.value = target === 'hotsearch';
 }
 
 async function runNav<T>(fn: () => Promise<T>): Promise<T | undefined> {
@@ -130,7 +166,6 @@ watch(
 
       const deepLink = props.initialApp ?? null;
       activeApp.value = deepLink;
-      syncFView();
       showHomeLayer.value = deepLink === null;
       showAppLayer.value = deepLink !== null;
 
@@ -171,11 +206,8 @@ watch(
 
 function resetPhoneState() {
   activeApp.value = null;
-  fView.value = 'compose';
   showHomeLayer.value = true;
   showAppLayer.value = false;
-  showFCompose.value = true;
-  showFHotsearch.value = false;
 }
 
 onBeforeUnmount(() => {
@@ -211,7 +243,6 @@ async function openApp(id: PhoneAppId, event?: MouseEvent) {
   }
 
   activeApp.value = id;
-  if (id === 'f') syncFView();
   showAppLayer.value = true;
   // Hide desktop before zoom so icons never appear to shrink underneath.
   showHomeLayer.value = false;
@@ -273,22 +304,12 @@ async function onBottomAction() {
   await backHome();
 }
 
-async function transitionFToHotsearch() {
-  if (fView.value === 'hotsearch' && showFHotsearch.value) return;
-
-  fView.value = 'hotsearch';
-  showFHotsearch.value = true;
-  await nextTick();
-
-  if (fComposeRef.value && fHotsearchRef.value) {
-    await playPush(fComposeRef.value, fHotsearchRef.value);
-  }
-  showFCompose.value = false;
+function onTweetPost(content: string) {
+  emit('tweetPosted', content);
 }
 
-async function onTweetPost(content: string) {
-  emit('tweetPosted', content);
-  await runNav(() => transitionFToHotsearch());
+function onChipPost(content: string) {
+  emit('chipPost', content);
 }
 
 function onHotSearchSeen() {
@@ -325,126 +346,123 @@ function onBottomClick() {
       @click="close"
     />
 
-    <div
-      ref="deviceRef"
-      class="ml-phone__device"
-      :class="{ 'is-immersive-app': isImmersiveApp }"
-    >
-      <img
-        v-show="!isImmersiveApp"
-        class="ml-phone__base"
-        :src="phoneBase"
-        alt=""
-        draggable="false"
-      />
+    <div class="ml-phone__frame">
+      <div
+        ref="deviceRef"
+        class="ml-phone__device"
+        :class="{ 'is-immersive-app': isImmersiveApp }"
+      >
+        <img
+          v-show="!isImmersiveApp"
+          class="ml-phone__base"
+          :src="phoneBase"
+          alt=""
+          draggable="false"
+        />
 
-      <div class="ml-phone__screen">
-        <div
-          v-show="showHomeLayer"
-          ref="homeRef"
-          class="ml-phone__layer ml-phone__apps"
-        >
-          <button
-            v-for="(app, id) in APP_MOCKUPS"
-            :key="id"
-            type="button"
-            class="ml-phone__app"
-            @click="onAppClick(id as PhoneAppId, $event)"
+        <div class="ml-phone__screen">
+          <div
+            v-show="showHomeLayer"
+            ref="homeRef"
+            class="ml-phone__layer ml-phone__apps"
           >
-            <span class="ml-phone__icon-wrap">
-              <img
-                class="ml-phone__icon"
-                :src="APP_ICONS[id as PhoneAppId]"
-                :alt="app.title"
-                draggable="false"
-              />
-              <span
-                v-if="props.appBadges?.[id as PhoneAppId]"
-                class="ml-phone__badge"
-                aria-hidden="true"
-              />
-            </span>
-            <span class="ml-phone__label">{{ app.title }}</span>
-          </button>
-        </div>
-
-        <div
-          v-show="showAppLayer"
-          ref="appRef"
-          class="ml-phone__layer ml-phone__app-view is-immersive"
-        >
-          <FtubeScreen
-            v-if="activeApp === 'ftube'"
-            ref="ftubeRef"
-            :locked="Boolean(guardMessage('ftube'))"
-            :watched="ftubeWatchedForEpisode"
-            :episode="props.ftubeEpisode ?? 'crisis'"
-            :interactive="!phoneBooting"
-            :guard-message="guardMessage('ftube')"
-            @watched="onFtubeWatched"
-          />
-
-          <FelegramChat
-            v-show="activeApp === 'felegram'"
-            ref="felegramRef"
-            :locked="Boolean(guardMessage('felegram'))"
-            :completed="Boolean(props.dmCompleted)"
-            :aide-unlocked="Boolean(props.aideUnlocked)"
-            :aide-briefing-completed="Boolean(props.aideBriefingCompleted)"
-            :aide-phase="props.aidePhase ?? 'briefing'"
-            :reply-counts="props.felegramReplyCounts ?? {}"
-            :aide-investigation-reply-count="props.aideInvestigationReplyCount ?? 0"
-            :guard-message="guardMessage('felegram')"
-            @complete="emit('negotiationComplete', $event)"
-            @aide-complete="emit('aideComplete', $event)"
-            @progress="emit('felegramProgress', $event)"
-          />
-
-          <div v-if="activeApp === 'f'" class="ml-phone__stack">
-            <div
-              v-show="showFCompose"
-              ref="fComposeRef"
-              class="ml-phone__stack-layer"
+            <button
+              v-for="(app, id) in APP_MOCKUPS"
+              :key="id"
+              type="button"
+              class="ml-phone__app"
+              @click="onAppClick(id as PhoneAppId, $event)"
             >
-              <FSocialPost
-                :locked="Boolean(guardMessage('f'))"
-                :posted="Boolean(props.tweetPosted)"
-                :guard-message="guardMessage('f')"
-                @post="onTweetPost"
-              />
-            </div>
-            <div
-              v-show="showFHotsearch"
-              ref="fHotsearchRef"
-              class="ml-phone__stack-layer"
-            >
-              <FHotSearch @seen="onHotSearchSeen" />
-            </div>
+              <span class="ml-phone__icon-wrap">
+                <img
+                  class="ml-phone__icon"
+                  :src="APP_ICONS[id as PhoneAppId]"
+                  :alt="app.title"
+                  draggable="false"
+                />
+                <span
+                  v-if="props.appBadges?.[id as PhoneAppId]"
+                  class="ml-phone__badge"
+                  aria-hidden="true"
+                />
+              </span>
+              <span class="ml-phone__label">{{ app.title }}</span>
+            </button>
           </div>
 
           <div
-            v-else-if="activeApp && activeApp !== 'ftube' && activeApp !== 'felegram'"
-            class="ml-phone__placeholder"
+            v-show="showAppLayer"
+            ref="appRef"
+            class="ml-phone__layer ml-phone__app-view is-immersive"
           >
-            <div class="ml-phone__app-view-head">
-              <img
-                class="ml-phone__app-view-icon"
-                :src="APP_ICONS[activeApp]"
-                :alt="APP_MOCKUPS[activeApp].title"
-                draggable="false"
-              />
-              <h3>{{ APP_MOCKUPS[activeApp].title }}</h3>
-            </div>
-            <p>{{ APP_MOCKUPS[activeApp].desc }}</p>
-            <p class="ml-phone__note">本案例未涉及此 App</p>
+            <FtubeScreen
+              v-if="activeApp === 'ftube'"
+              ref="ftubeRef"
+              :locked="Boolean(guardMessage('ftube'))"
+              :episode="props.ftubeEpisode ?? 'crisis'"
+              :ftube-watched="Boolean(props.ftubeWatched)"
+              :reopen-watched="Boolean(props.reopenWatched)"
+              :interactive="!phoneBooting"
+              :guard-message="guardMessage('ftube')"
+              @watched="onFtubeWatched"
+            />
+
+            <FelegramChat
+              v-show="activeApp === 'felegram'"
+              ref="felegramRef"
+              :locked="Boolean(guardMessage('felegram'))"
+              :completed="Boolean(props.dmCompleted)"
+              :aide-unlocked="Boolean(props.aideUnlocked)"
+              :aide-briefing-completed="Boolean(props.aideBriefingCompleted)"
+              :aide-phase="props.aidePhase ?? 'briefing'"
+              :threads="props.felegramThreads"
+              :family-group="props.familyGroup"
+              :family-tech-tip-raised="Boolean(props.familyTechTipRaised)"
+              :guard-message="guardMessage('felegram')"
+              :hidden-contact-ids="props.hiddenContactIds"
+              :contact-outcome-overrides="props.contactOutcomeOverrides"
+              :aide-act-override="props.aideActOverride"
+              :contact-script-overrides="props.contactScriptOverrides"
+              @complete="emit('negotiationComplete', $event)"
+              @aide-complete="emit('aideComplete', $event)"
+              @thread-update="emit('felegramThreadUpdate', $event)"
+              @invite-family-members="emit('inviteFamilyMembers', $event)"
+              @group-beat="emit('groupBeat', $event)"
+              @family-open="emit('familyOpen')"
+              @thread-focus="emit('felegramThreadFocus', $event)"
+            />
+
+            <FApp
+              v-if="activeApp === 'f'"
+              :locked="Boolean(guardMessage('f'))"
+              :posted="Boolean(props.tweetPosted)"
+              :chip-post-available="Boolean(props.chipPostAvailable)"
+              :chip-posted="Boolean(props.chipPosted)"
+              :autofill-post-text="props.autofillPostText"
+              :guard-message="guardMessage('f')"
+              @post="onTweetPost"
+              @chip-post="onChipPost"
+              @hot-search-seen="onHotSearchSeen"
+            />
+
+            <GreenhoodScreen
+              v-if="activeApp === 'greenhood' && props.greenhoodStore"
+              :store="props.greenhoodStore"
+              :locked="Boolean(guardMessage('greenhood'))"
+              :guard-message="guardMessage('greenhood') ?? undefined"
+              @buy="emit('greenhoodBuy', $event)"
+              @sell="emit('greenhoodSell', $event)"
+              @refresh="emit('greenhoodRefresh', $event)"
+            />
           </div>
         </div>
       </div>
-
-      <button type="button" class="ml-phone__close" @click="onBottomClick">
-        {{ bottomActionLabel }}
-      </button>
     </div>
+
+    <!-- Pinned to overlay bottom (not below the phone) so stage overflow cannot clip it. -->
+    <button type="button" class="ml-phone__close" @click="onBottomClick">
+      {{ bottomActionLabel }}
+    </button>
   </div>
 </template>
 
@@ -453,14 +471,16 @@ function onBottomClick() {
   position: absolute;
   inset: 0;
   z-index: 30;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
-  /* Keep device below top HUD and above bottom dock. */
+  /* Top: clear HUD. Bottom: reserved strip for the pinned 返回/关闭 control. */
   padding:
     calc(var(--yp-hud-safe-top) + var(--yp-hud-top-time-min-h) + 8px)
     12px
-    calc(var(--yp-hud-safe-bottom) + var(--yp-hud-dock-btn-min-h) * 0.42)
+    56px
     12px;
 }
 
@@ -477,12 +497,26 @@ function onBottomClick() {
   cursor: pointer;
 }
 
+.ml-phone__frame {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
 .ml-phone__device {
   position: relative;
-  width: min(480px, 86vw, calc(78vh * 9 / 16));
+  /* Fit inside the padded frame; never spill into the bottom control strip. */
+  width: min(420px, 100%);
   max-height: 100%;
   aspect-ratio: 9 / 16;
-  z-index: 1;
+  height: auto;
+  flex: 0 1 auto;
   filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55));
   will-change: transform, opacity;
 }
@@ -660,17 +694,21 @@ function onBottomClick() {
 .ml-phone__close {
   position: absolute;
   left: 50%;
-  bottom: -44px;
+  bottom: 10px;
   transform: translateX(-50%);
-  z-index: 5;
-  padding: 8px 18px;
-  border: 1px solid rgba(184, 149, 98, 0.45);
+  z-index: 40;
+  flex: none;
+  padding: 8px 22px;
+  border: 1px solid rgba(184, 149, 98, 0.65);
   border-radius: 999px;
-  background: rgba(12, 14, 16, 0.88);
+  background: rgba(12, 14, 16, 0.96);
   color: var(--yp-color-text-main);
   font-family: var(--yp-font-serif);
   font-size: 0.95rem;
+  letter-spacing: 0.08em;
   cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
 }
 
 .ml-phone__close:hover {

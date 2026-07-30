@@ -4,7 +4,7 @@
 
 ## 安装与导入
 
-本地开发（树懒国 monorepo 内）：
+本地开发（Yes President monorepo 内）：
 
 ```json
 {
@@ -157,7 +157,7 @@ Slots: `header`, default, `footer`
 - `chat-bubble-frame-in` — slice `72`，width `14px`，入站气泡，用于 **FelegramChat**
 - `chat-bubble-frame-out` — 同 slice/width，出站青绿染色变体，用于 **FelegramChat**
 
-主循环资源条：标签在上、数值在下；**不要**加趋势箭头。任期进度用细 pill，不用 `GameProgressBar`。详见 [HUD_LAYOUT.md](./HUD_LAYOUT.md) §5。
+主循环资源条：标签在上、数值在下；**不要**加趋势箭头。顶栏五项为民众支持率 / 总统威望度 / 个人安全值 / 治安指数 / 家族资产（见 `playground/main-loop/data.ts` 与 `docs/game-design/systems/数值分层.md`）。任期进度用细 pill，不用 `GameProgressBar`。详见 [HUD_LAYOUT.md](./HUD_LAYOUT.md) §5。
 
 ### GameTitleDivider
 

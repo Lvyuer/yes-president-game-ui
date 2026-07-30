@@ -26,6 +26,11 @@ const props = defineProps<{
   pendingLabel?: string;
   feedbackPending?: boolean;
   resourceRoll?: ResourceRollState | null;
+  showWeekControls?: boolean;
+}>();
+
+const emit = defineEmits<{
+  endWeek: [];
 }>();
 
 const termText = computed(() => props.termLabel ?? TERM_META.termLabel);
@@ -135,6 +140,12 @@ const rollingItems = computed(() => {
         >
           <div class="ml-hud__fill" :style="{ width: `${progress}%` }" />
         </div>
+
+        <div v-if="props.showWeekControls" class="ml-hud__week-controls">
+          <button type="button" class="ml-hud__week-btn ml-hud__week-btn--primary" @click="emit('endWeek')">
+            结束本周
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -180,13 +191,18 @@ const rollingItems = computed(() => {
 
 .ml-hud__bar {
   min-width: 0;
+  align-self: stretch;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .ml-hud__bar :deep(.yp-resource-bar),
 .ml-hud__bar.yp-resource-bar {
   width: 100%;
-  min-height: var(--yp-hud-top-time-min-h);
+  height: 100%;
+  min-height: 0;
   background: transparent;
+  box-sizing: border-box;
 }
 
 .ml-hud__bar :deep(.yp-resource-bar__inner),
@@ -196,9 +212,10 @@ const rollingItems = computed(() => {
   align-items: center;
   justify-content: space-between;
   gap: 4px 8px;
-  min-height: inherit;
+  height: 100%;
+  min-height: 0;
   box-sizing: border-box;
-  padding: calc(var(--yp-frame-resource-bar-safe) + 2px)
+  padding: calc(var(--yp-frame-resource-bar-safe) * 0.55)
     calc(var(--yp-frame-resource-bar-safe) + 6px);
 }
 
@@ -208,9 +225,9 @@ const rollingItems = computed(() => {
   display: flex;
   flex: 1 1 0;
   align-items: center;
-  gap: 12px;
+  gap: calc(10px * var(--yp-hud-scale));
   min-width: 0;
-  padding: 0 12px;
+  padding: 0 calc(10px * var(--yp-hud-scale));
   transition: filter 0.25s ease;
 }
 
@@ -280,8 +297,8 @@ const rollingItems = computed(() => {
 .ml-hud__bar :deep(.yp-resource-bar__label),
 .ml-hud__bar .yp-resource-bar__label {
   font-family: var(--yp-font-serif);
-  font-size: 1.35rem;
-  letter-spacing: 0.08em;
+  font-size: calc(var(--yp-hud-font-resource-label) * 0.82);
+  letter-spacing: 0.06em;
   text-transform: none;
   color: var(--yp-color-text-muted);
 }
@@ -289,7 +306,7 @@ const rollingItems = computed(() => {
 .ml-hud__bar :deep(.yp-resource-bar__value),
 .ml-hud__bar .yp-resource-bar__value {
   font-family: var(--yp-font-data);
-  font-size: 2.35rem;
+  font-size: calc(var(--yp-hud-font-resource-value) * 0.88);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--yp-color-text-main);
@@ -298,7 +315,7 @@ const rollingItems = computed(() => {
 
 .ml-hud.is-rolling .ml-hud__bar :deep(.yp-resource-bar__value),
 .ml-hud.is-rolling .ml-hud__bar .yp-resource-bar__value {
-  font-size: 2.35rem;
+  font-size: var(--yp-hud-font-resource-value);
   letter-spacing: 0.02em;
   transition: font-size 0.75s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -306,15 +323,15 @@ const rollingItems = computed(() => {
 .ml-hud.is-rolling .ml-hud__bar :deep(.yp-resource-bar__value:has(.ml-count-up.is-intro)),
 .ml-hud.is-rolling .ml-hud__bar :deep(.yp-resource-bar__value:has(.ml-count-up.is-rolling)),
 .ml-hud.is-rolling .ml-hud__bar :deep(.yp-resource-bar__value:has(.ml-count-up.is-holding)) {
-  font-size: 1.95rem;
+  font-size: var(--yp-hud-font-resource-value-roll);
   letter-spacing: 0.01em;
 }
 
 .ml-hud__bar :deep(.yp-resource-bar__icon),
 .ml-hud__bar .yp-resource-bar__icon {
   flex: 0 0 auto;
-  width: 96px;
-  height: 96px;
+  width: calc(var(--yp-hud-resource-icon) * 0.78);
+  height: calc(var(--yp-hud-resource-icon) * 0.78);
   object-fit: contain;
   opacity: 0.92;
   filter: sepia(0.25) saturate(0.85);
@@ -326,13 +343,16 @@ const rollingItems = computed(() => {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 8px;
+  gap: calc(4px * var(--yp-hud-scale));
   min-width: 0;
 }
 
 .ml-hud__time {
   background: transparent;
-  min-height: var(--yp-hud-top-time-min-h);
+  min-height: 0;
+  height: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
 }
 
 .ml-hud__time-inner {
@@ -340,10 +360,10 @@ const rollingItems = computed(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: calc(var(--yp-frame-resource-item-safe) + 4px)
-    calc(var(--yp-frame-resource-item-safe) + 12px)
-    calc(var(--yp-frame-resource-item-safe) + 8px);
+  gap: calc(10px * var(--yp-hud-scale));
+  padding: calc(var(--yp-frame-resource-item-safe) * 0.7)
+    calc(var(--yp-frame-resource-item-safe) + calc(12px * var(--yp-hud-scale)))
+    calc(var(--yp-frame-resource-item-safe) * 0.75);
   height: 100%;
   box-sizing: border-box;
   text-align: center;
@@ -352,7 +372,7 @@ const rollingItems = computed(() => {
 .ml-hud__term {
   margin: 0;
   font-family: var(--yp-font-serif);
-  font-size: 1.65rem;
+  font-size: var(--yp-hud-font-term);
   font-weight: 700;
   letter-spacing: 0.14em;
   line-height: 1.25;
@@ -367,14 +387,14 @@ const rollingItems = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: calc(8px * var(--yp-hud-scale));
   max-width: 100%;
 }
 
 .ml-hud__hourglass {
   flex: 0 0 auto;
-  width: 1.05rem;
-  height: 1.05rem;
+  width: calc(1.05rem * var(--yp-hud-scale));
+  height: calc(1.05rem * var(--yp-hud-scale));
   color: var(--yp-color-gold);
   opacity: 0.92;
 }
@@ -382,7 +402,7 @@ const rollingItems = computed(() => {
 .ml-hud__midterm {
   margin: 0;
   font-family: var(--yp-font-serif);
-  font-size: 1rem;
+  font-size: var(--yp-hud-font-midterm);
   font-weight: 400;
   letter-spacing: 0.06em;
   line-height: 1.3;
@@ -392,8 +412,8 @@ const rollingItems = computed(() => {
 
 .ml-hud__track {
   width: 88%;
-  height: 8px;
-  margin-top: 2px;
+  height: var(--yp-hud-progress-track-h);
+  margin-top: calc(2px * var(--yp-hud-scale));
   border-radius: 999px;
   border: 1px solid rgba(230, 225, 211, 0.55);
   background: rgba(0, 0, 0, 0.45);
@@ -406,6 +426,39 @@ const rollingItems = computed(() => {
   border-radius: inherit;
   background: #e6e1d3;
   transition: width var(--yp-motion-base);
+}
+
+.ml-hud__week-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(6px * var(--yp-hud-scale));
+  width: 100%;
+  margin-top: calc(4px * var(--yp-hud-scale));
+}
+
+.ml-hud__week-btn {
+  margin: 0;
+  padding: calc(6px * var(--yp-hud-scale)) calc(10px * var(--yp-hud-scale));
+  border: 1px solid rgba(184, 149, 98, 0.45);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  font-family: var(--yp-font-serif);
+  font-size: calc(0.78rem * var(--yp-hud-scale));
+  letter-spacing: 0.04em;
+  color: var(--yp-color-text-main);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ml-hud__week-btn:hover {
+  border-color: var(--yp-color-gold-bright);
+  background: rgba(184, 149, 98, 0.12);
+}
+
+.ml-hud__week-btn--primary {
+  border-color: rgba(215, 188, 126, 0.65);
+  color: var(--yp-color-gold-bright);
 }
 
 @media (max-width: 900px) {

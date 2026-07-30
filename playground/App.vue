@@ -40,7 +40,7 @@ type PageId = keyof typeof pageMap;
 const currentId = ref<PageId>('overview');
 
 function parseHash(): PageId {
-  const raw = window.location.hash.replace(/^#\/?/, '') || 'overview';
+  const raw = (window.location.hash.replace(/^#\/?/, '') || 'overview').split(/[?#]/)[0];
   return (raw in pageMap ? raw : 'overview') as PageId;
 }
 
@@ -122,6 +122,7 @@ html,
 body,
 #app {
   margin: 0;
+  height: 100%;
   min-height: 100%;
   background: #050607;
 }
@@ -129,12 +130,18 @@ body,
 .docs-shell {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   color: var(--yp-color-text-main);
 }
 
 .docs-shell--fullscreen {
   grid-template-columns: 1fr;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .docs-shell__sidebar {
@@ -247,7 +254,10 @@ body,
 .docs-shell__main--fullscreen {
   padding: 0;
   background: #050607;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .docs-shell__crumb {

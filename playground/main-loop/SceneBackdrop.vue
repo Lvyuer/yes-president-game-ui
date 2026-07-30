@@ -7,6 +7,7 @@ import {
   getSceneVideoSrc,
   isHoldMode,
   listIdleVideoSrcs,
+  playbackRateForClip,
   type SceneBackdropMode,
   type SceneVideoClip,
 } from './sceneVideos';
@@ -291,6 +292,7 @@ async function prepareSlot(
   src: string,
   loop: boolean,
   restart: boolean,
+  playbackRate = 1,
 ): Promise<boolean> {
   const video = slotVideo(slot);
   if (!video) return false;
@@ -303,6 +305,8 @@ async function prepareSlot(
   if (restart) {
     video.currentTime = 0;
   }
+
+  video.playbackRate = playbackRate;
 
   return playDecodable(video, loop);
 }
@@ -399,7 +403,7 @@ async function applyMode(mode: SceneBackdropMode) {
 
   const current = visibleSlot.value;
   const targetSlot: Slot = current ? otherSlot(current) : 'a';
-  const played = await prepareSlot(targetSlot, src, false, true);
+  const played = await prepareSlot(targetSlot, src, false, true, playbackRateForClip(clip));
   if (generation !== applyGeneration) {
     slotVideo(targetSlot)?.pause();
     return;
@@ -495,7 +499,7 @@ async function loadDebugClip(
   }
 
   const targetSlot: Slot = visibleSlot.value ? otherSlot(visibleSlot.value) : 'a';
-  const played = await prepareSlot(targetSlot, src, false, true);
+  const played = await prepareSlot(targetSlot, src, false, true, playbackRateForClip(clip));
   if (generation !== applyGeneration) return;
 
   if (!played) {

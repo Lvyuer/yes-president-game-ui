@@ -15,10 +15,10 @@ const props = withDefaults(
     ariaLabel?: string;
   }>(),
   {
-    noticeTitle: '危机推送',
+    noticeTitle: '突发事件',
     cta: '查看现场',
     tone: 'danger',
-    ariaLabel: '危机推送',
+    ariaLabel: '突发事件',
   },
 );
 
@@ -109,11 +109,11 @@ function onOpen() {
 
 .ml-crisis :deep(.yp-notice__title) {
   margin: 0 0 10px;
-  font-family: var(--yp-font-latin);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--yp-font-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: none;
   color: #f0b0b0;
 }
 

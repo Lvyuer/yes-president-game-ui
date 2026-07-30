@@ -6,3 +6,14 @@ playground/dist/
 tsc-out.txt
 .DS_Store
 Thumbs.db
+__pycache__/
+*.tmp
+playground/main-loop/assets/_*.jpg
+src/assets/crop-*.txt
+src/assets/crop-*.json
+src/assets/raw/*backup*
+src/assets/raw/crop-backups/
+src/assets/raw/from-root/
+src/assets/raw/icon-recrop-backups/
+src/assets/raw/replace-4k-uncropped/
+src/assets/themes/default/icons/_trim_report.txt

@@ -271,21 +271,6 @@ async function focusTrigger() {
   );
   overflow-x: hidden;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(184, 149, 98, 0.55) transparent;
-}
-
-.yp-select__list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.yp-select__list::-webkit-scrollbar-thumb {
-  background: rgba(184, 149, 98, 0.45);
-  border-radius: 3px;
-}
-
-.yp-select__list::-webkit-scrollbar-track {
-  background: transparent;
 }
 
 .yp-select__option {

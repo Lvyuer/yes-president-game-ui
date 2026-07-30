@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const REQUIRED = [
+  '--yp-hud-scale',
   '--yp-hud-aspect',
   '--yp-hud-stage-pad',
   '--yp-hud-safe-x',
@@ -41,6 +42,7 @@ const consumers = [
 
 const expectedRefs = {
   'playground/main-loop/MainLoopShell.vue': [
+    '--yp-hud-scale',
     '--yp-hud-stage-pad',
     '--yp-hud-aspect',
     '--yp-hud-safe-x',

@@ -3,17 +3,12 @@ import DocsPageHeader from '../components/DocsPageHeader.vue';
 import DocsDemoBlock from '../components/DocsDemoBlock.vue';
 import DocsApiTable from '../components/DocsApiTable.vue';
 import { GameResourceBar } from '@/index';
-
-const items = [
-  { id: 'approval', label: 'APPROVAL', value: '64%', icon: 'chart' },
-  { id: 'budget', label: 'BUDGET', value: '¥ 12.4B', icon: 'document' },
-  { id: 'stability', label: 'STABILITY', value: '71', icon: 'action' },
-];
+import { RESOURCES } from '../main-loop/data';
 
 const apiRows = [
   { name: 'items', desc: '资源条目列表', type: 'GameResourceItem[]', defaultValue: '—' },
   { name: 'items[].id', desc: '唯一键', type: 'string', defaultValue: '—' },
-  { name: 'items[].label', desc: '英文标签', type: 'string', defaultValue: '—' },
+  { name: 'items[].label', desc: '中文指标名', type: 'string', defaultValue: '—' },
   { name: 'items[].value', desc: '展示值', type: 'string | number', defaultValue: '—' },
   { name: 'items[].icon', desc: '可选图标', type: 'string', defaultValue: '—' },
 ];
@@ -27,13 +22,10 @@ const apiRows = [
       description="顶部资源区：单层大框，图标与资源从左到右直排，无嵌套小框。"
     />
 
-    <DocsDemoBlock title="基础用法">
-      <GameResourceBar :items="items" />
+    <DocsDemoBlock title="主循环顶栏五项">
+      <GameResourceBar :items="RESOURCES" />
       <template #code>
-{{ `<GameResourceBar :items="[
-  { id: 'approval', label: 'APPROVAL', value: '64%', icon: 'chart' },
-  { id: 'budget', label: 'BUDGET', value: '¥ 12.4B', icon: 'document' },
-]" />` }}
+{{ `<GameResourceBar :items="RESOURCES" />` }}
       </template>
     </DocsDemoBlock>
 

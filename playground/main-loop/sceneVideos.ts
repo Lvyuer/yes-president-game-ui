@@ -18,6 +18,13 @@ export type SceneBackdropMode =
 /** When false, idle mode stays on the static poster (no random ambient clips). */
 export const AMBIENT_IDLE_ENABLED = false;
 
+/**
+ * Master switch for all scene backdrop videos (idle / phone / publish / advisor).
+ * When false, always stay on the static oval-office poster; clip callers still get
+ * ended/paused fallbacks so game flow is not blocked.
+ */
+export const SCENE_VIDEOS_ENABLED = false;
+
 /** Vite resolves known extensions at build/dev time; missing files simply aren't listed. */
 const videoModules = import.meta.glob('./assets/video/*.{webm,mp4}', {
   eager: true,
@@ -43,6 +50,7 @@ function resolveNamedSrc(stem: string): string | null {
 
 /** All available idle loop URLs (showcase loops + optional idle.webm/mp4). */
 export function listIdleVideoSrcs(): string[] {
+  if (!SCENE_VIDEOS_ENABLED) return [];
   const fromNamed = IDLE_FILE_STEMS.map(resolveNamedSrc).filter((src): src is string => !!src);
   const legacy = resolveNamedSrc('idle');
   const all = legacy ? [...fromNamed, legacy] : [...fromNamed];
@@ -78,6 +86,10 @@ function resolveClipSrc(clip: SceneVideoClip): string | null {
 
 /** Resolve clip URL (webm first, then mp4). Idle always re-rolls randomly. */
 export async function getSceneVideoSrc(clip: SceneVideoClip): Promise<string | null> {
+  if (!SCENE_VIDEOS_ENABLED) {
+    return null;
+  }
+
   if (clip === 'idle') {
     const src = pickRandomIdleSrc();
     if (!src) {
@@ -119,4 +131,10 @@ export function isHoldMode(mode: SceneBackdropMode): boolean {
 
 export function isAdvisorMode(mode: SceneBackdropMode): boolean {
   return mode === 'advisor-arrive' || mode === 'advisor-hold' || mode === 'advisor-leave';
+}
+
+/** Non-1 rates shorten one-shot transition clips (e.g. phone-end ~4s → ~1.3s at 3×). */
+export function playbackRateForClip(clip: SceneVideoClip): number {
+  if (clip === 'phone-end') return 3;
+  return 1;
 }
